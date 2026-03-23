@@ -5,6 +5,7 @@ import Lenis from "lenis";
 gsap.registerPlugin(ScrollTrigger);
 
 let lenis;
+let lenisTicker;
 
 export function initSmoothScroll() {
   lenis = new Lenis({
@@ -16,15 +17,20 @@ export function initSmoothScroll() {
 
   lenis.on("scroll", ScrollTrigger.update);
 
-  gsap.ticker.add((time) => {
-    lenis.raf(time * 1000);
-  });
+  lenisTicker = (time) => {
+    if (lenis) lenis.raf(time * 1000);
+  };
+  gsap.ticker.add(lenisTicker);
   gsap.ticker.lagSmoothing(0);
 
   return lenis;
 }
 
 export function destroySmoothScroll() {
+  if (lenisTicker) {
+    gsap.ticker.remove(lenisTicker);
+    lenisTicker = null;
+  }
   if (lenis) {
     lenis.destroy();
     lenis = null;

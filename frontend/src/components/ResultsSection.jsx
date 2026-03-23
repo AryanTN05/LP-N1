@@ -6,16 +6,25 @@ const cards = [
     num: "01",
     title: "Qualified Meetings Only",
     desc: "Pipeline filled with decision-makers actively looking for your solution. No time-wasters, no tire-kickers — just people who need what you sell.",
+    color: "rgba(95,143,138,0.88)",
+    accent: "#0a0a0a",
+    textColor: "#0a0a0a",
   },
   {
     num: "02",
     title: "5–15% Reply Rates",
     desc: "AI-personalized outreach that resonates. Not generic templates — messages written around each prospect's specific context, company, and pain.",
+    color: "rgba(212,120,92,0.88)",
+    accent: "#0a0a0a",
+    textColor: "#0a0a0a",
   },
   {
     num: "03",
     title: "System You Own",
     desc: "Full transparency across every campaign, metric, and workflow. Once proven, I hand everything off — no vendor lock-in, no dependency on me.",
+    color: "rgba(30,45,53,0.92)",
+    accent: "#5c939f",
+    textColor: "#ffffff",
   },
 ];
 
@@ -89,22 +98,27 @@ export default function ResultsSection() {
             <div
               key={i}
               data-testid={`result-item-${i}`}
-              className="results-card glass-card tilt-card rounded-[20px] p-8 md:p-10 flex flex-col gap-6 group"
+              className="results-card hover-card-dark rounded-[20px] p-8 md:p-10 flex flex-col gap-6"
+              style={{
+                background: card.color,
+                backdropFilter: "blur(28px) saturate(160%)",
+                WebkitBackdropFilter: "blur(28px) saturate(160%)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                color: card.textColor,
+              }}
             >
-              <span className="font-mono text-xs tracking-[0.25em] text-zinc-600 group-hover:text-[#5c939f] transition-colors duration-300">
+              <span className="font-mono text-xs tracking-[0.25em]" style={{ color: card.accent, opacity: 0.6 }}>
                 {card.num} / 03
               </span>
               <div>
-                <h3 className="font-heading text-xl uppercase tracking-wide text-white mb-3">
+                <h3 className="font-heading text-xl uppercase tracking-wide mb-3" style={{ color: card.textColor }}>
                   {card.title}
                 </h3>
-                <p className="text-base text-zinc-300 leading-relaxed">
+                <p className="text-base leading-relaxed" style={{ color: card.textColor, opacity: 0.75 }}>
                   {card.desc}
                 </p>
               </div>
-              {/* Accent corner */}
-              <div className="mt-auto h-px bg-gradient-to-r from-[#5c939f]/0 via-[#5c939f]/30 to-[#5c939f]/0
-                              opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
           ))}
         </div>

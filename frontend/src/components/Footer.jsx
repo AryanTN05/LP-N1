@@ -59,7 +59,11 @@ export default function Footer() {
           <div
             className="w-full rounded-[24px] flex flex-col justify-between px-10 py-12"
             style={{
-              background: "var(--infrared)",
+              background: "rgba(237, 109, 64, 0.88)",
+              backdropFilter: "blur(28px) saturate(160%)",
+              WebkitBackdropFilter: "blur(28px) saturate(160%)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
               minHeight: 400,
             }}
           >
@@ -119,7 +123,7 @@ export default function Footer() {
               <Mail className="w-4 h-4" />
             </a>
             <a
-              href="https://linkedin.com/in/aryantn"
+              href="https://www.linkedin.com/in/aryan-tn/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-zinc-500 hover:text-[#5c939f] transition-colors duration-300"

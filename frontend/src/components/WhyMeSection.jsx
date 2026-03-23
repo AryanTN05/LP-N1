@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { gsap, animateTextReveal } from "@/lib/animations";
 
@@ -23,56 +23,31 @@ const slides = [
     num: "03",
     title: "Full Transparency",
     tag: "Ownership",
-    color: "#1b1b1b",
-    accent: "#ed6d40",
+    color: "#d4785c",
+    accent: "#0a0a0a",
     desc: "You get access to every workflow, every metric, every campaign. No black boxes, no gatekeeping. It's your system.",
   },
   {
     num: "04",
     title: "Fast Execution",
     tag: "Speed",
-    color: "#d4785c",
-    accent: "#0a0a0a",
+    color: "#1e2d35",
+    accent: "#5c939f",
     desc: "Infrastructure built in 2 weeks. Campaigns live by week 3. First qualified leads before day 30.",
   },
   {
     num: "05",
     title: "Handoff Ready",
     tag: "Independence",
-    color: "#c8c8c8",
-    accent: "#111111",
+    color: "#0a0a0a",
+    accent: "#5c939f",
     desc: "Unlike agencies that lock you in, I build systems you can eventually own. Prove it works with me, then run it yourself.",
   },
 ];
 
 function TiltCard({ slide, isActive, onClick }) {
-  const cardRef = useRef(null);
-
-  const handleMouseMove = useCallback((e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    gsap.to(cardRef.current, {
-      rotationY: x * 12,
-      rotationX: -y * 12,
-      transformPerspective: 900,
-      duration: 0.3,
-      ease: "power2.out",
-    });
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!cardRef.current) return;
-    gsap.to(cardRef.current, {
-      rotationY: 0,
-      rotationX: 0,
-      duration: 0.6,
-      ease: "power3.out",
-    });
-  }, []);
-
-  const textColor = ["#c8c8c8", "#d4785c", "#5f8f8a"].includes(slide.color) ? "#0a0a0a" : "#ffffff";
+  const textColor = ["#5f8f8a", "#d4785c"].includes(slide.color) ? "#0a0a0a" : "#ffffff";
+  const isLight = textColor === "#0a0a0a";
 
   return (
     <div
@@ -80,11 +55,18 @@ function TiltCard({ slide, isActive, onClick }) {
       onClick={onClick}
     >
       <div
-        ref={cardRef}
-        className="tilt-card h-full min-h-[380px] md:min-h-[480px] rounded-[20px] p-8 md:p-10 flex flex-col justify-between cursor-pointer"
-        style={{ background: slide.color, color: textColor }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        className="hover-card-dark h-full min-h-[380px] md:min-h-[480px] rounded-[20px] p-8 md:p-10 flex flex-col justify-between cursor-pointer"
+        style={{
+          background: `${slide.color}e6`,
+          backdropFilter: "blur(28px) saturate(160%)",
+          WebkitBackdropFilter: "blur(28px) saturate(160%)",
+          border: `1px solid ${isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.1)"}`,
+          boxShadow: isActive
+            ? `0 24px 64px rgba(0,0,0,0.45), inset 0 1px 0 ${isLight ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)"}`
+            : `0 8px 28px rgba(0,0,0,0.2), inset 0 1px 0 ${isLight ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.06)"}`,
+          color: textColor,
+          transition: "box-shadow 0.4s ease",
+        }}
       >
         <div className="flex items-start justify-between">
           <span
@@ -126,10 +108,23 @@ function TiltCard({ slide, isActive, onClick }) {
 export default function WhyMeSection() {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
+  const carouselRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
   const prev = () => setActiveIdx((i) => (i === 0 ? slides.length - 1 : i - 1));
   const next = () => setActiveIdx((i) => (i === slides.length - 1 ? 0 : i + 1));
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+    const activeCard = carousel.querySelectorAll(".work-slide")[activeIdx];
+    if (activeCard) {
+      const cardLeft = activeCard.offsetLeft;
+      const cardWidth = activeCard.offsetWidth;
+      const carouselWidth = carousel.offsetWidth;
+      carousel.scrollTo({ left: cardLeft - (carouselWidth - cardWidth) / 2, behavior: "smooth" });
+    }
+  }, [activeIdx]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -195,7 +190,7 @@ export default function WhyMeSection() {
         </div>
 
         {/* Carousel — active card expands in-place, cards visible around it */}
-        <div className="work-carousel">
+        <div className="work-carousel" ref={carouselRef}>
           {slides.map((slide, i) => (
             <TiltCard
               key={slide.num}

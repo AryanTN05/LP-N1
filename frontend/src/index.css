@@ -201,10 +201,12 @@ body {
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
   transition: flex 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.4s ease,
               border-color 0.4s ease;
@@ -212,10 +214,11 @@ body {
 
 .ethos-card:hover {
   flex: 1.8;
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
   box-shadow:
-    0 20px 48px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 24px 56px rgba(0, 0, 0, 0.5),
+    0 0 32px rgba(92, 147, 159, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .ethos-card h3 {
@@ -231,17 +234,17 @@ body {
   opacity: 0.85 !important;
 }
 
-.ethos-card-black { background: #0a0a0a; }
+.ethos-card-black { background: rgba(10, 10, 10, 0.92); }
 .ethos-card-black, .ethos-card-black h3, .ethos-card-black p, .ethos-card-black span { color: #ffffff !important; }
 
-.ethos-card-teal { background: #5f8f8a; }
+.ethos-card-teal { background: rgba(95, 143, 138, 0.88); }
 .ethos-card-teal, .ethos-card-teal h3, .ethos-card-teal p, .ethos-card-teal span { color: #0a0a0a !important; }
 
-.ethos-card-orange { background: #d4785c; }
+.ethos-card-orange { background: rgba(212, 120, 92, 0.88); }
 .ethos-card-orange, .ethos-card-orange h3, .ethos-card-orange p, .ethos-card-orange span { color: #0a0a0a !important; }
 
-.ethos-card-light { background: #c8c8c8; }
-.ethos-card-light, .ethos-card-light h3, .ethos-card-light p, .ethos-card-light span { color: #111111 !important; }
+.ethos-card-light { background: rgba(30, 45, 53, 0.92); }
+.ethos-card-light, .ethos-card-light h3, .ethos-card-light p, .ethos-card-light span { color: #ffffff !important; }
 
 /* Dot-art inside cards */
 .dot-art {
@@ -350,23 +353,26 @@ body {
 
 /* ═══════════════ GLASS CARD (dark sections) ═══════════════ */
 .glass-card {
-  background: rgba(18, 18, 20, 0.55);
+  background: rgba(18, 18, 20, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.09);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(92, 147, 159, 0.22);
-  transform: translateY(-4px);
+  border-color: rgba(92, 147, 159, 0.35);
+  transform: translateY(-7px) scale(1.015);
   box-shadow:
-    0 24px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(92, 147, 159, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 28px 56px rgba(0, 0, 0, 0.55),
+    0 0 28px rgba(92, 147, 159, 0.18),
+    0 0 0 1px rgba(92, 147, 159, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* ═══════════════ LIGHT CARD ═══════════════ */
@@ -374,18 +380,53 @@ body {
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.75);
   border-radius: 1.25rem;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s ease,
+              background 0.35s ease;
 }
 
 .light-card:hover {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.13);
+  transform: translateY(-7px) scale(1.015);
+}
+
+/* ═══════════════ DARK INLINE CARD (Process, WhyMe) ═══════════════ */
+.hover-card-dark {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease !important;
+}
+
+.hover-card-dark:hover {
+  transform: translateY(-7px) scale(1.015) !important;
+  border-color: rgba(92, 147, 159, 0.35) !important;
+  box-shadow:
+    0 28px 56px rgba(0, 0, 0, 0.5),
+    0 0 28px rgba(92, 147, 159, 0.2),
+    0 0 0 1px rgba(92, 147, 159, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ═══════════════ LIGHT INLINE CARD (Solution) ═══════════════ */
+.hover-card-light {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s ease,
+              border-color 0.35s ease !important;
+}
+
+.hover-card-light:hover {
+  transform: translateY(-6px) scale(1.012) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 /* ═══════════════ SECTION DIVIDER ═══════════════ */
@@ -658,7 +699,12 @@ html.lenis, html.lenis body { height: auto; }
 .work-carousel {
   display: flex;
   gap: 0.75rem;
-  overflow: hidden;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.work-carousel::-webkit-scrollbar {
+  display: none;
 }
 .work-slide {
   flex-shrink: 0;
