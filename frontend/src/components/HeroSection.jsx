@@ -139,16 +139,10 @@ export default function HeroSection() {
             target="_blank"
             rel="noopener noreferrer"
             data-testid="hero-cta"
-            className="group relative inline-flex items-center px-5 py-4 text-white hover:text-white transition-colors"
+            className="btn-bracket text-white"
           >
-            {/* Top Left Bracket */}
-            <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-white/60 transition-all group-hover:border-white group-hover:w-4 group-hover:h-4"></span>
-            
-            {/* Bottom Right Bracket */}
-            <span className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-white/60 transition-all group-hover:border-white group-hover:w-4 group-hover:h-4"></span>
-            
-            <span className="mr-4 font-mono font-bold text-[12px] tracking-[0.2em] uppercase">BOOK AN AUDIT</span>
-            <ArrowRight className="w-4 h-4 text-white/70 group-hover:text-white transition-transform group-hover:translate-x-1" />
+            Book an Audit
+            <ArrowRight className="w-4 h-4" />
           </a>
         </div>
 
