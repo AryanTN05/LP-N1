@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { gsap } from "@/lib/animations";
 
 export default function ParticleCanvas() {
   const mountRef = useRef(null);
@@ -11,144 +12,439 @@ export default function ParticleCanvas() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // Scene — no fog, sphere is the focal point
     const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, width / height, 1, 4000);
+    // Move camera further back to ensure depth stays intact behind texts
+    camera.position.z = 1200;
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(55, width / height, 1, 4000);
-    camera.position.z = 950;
-
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
-    // ── Sphere particle system (WQF style) ────────────────────────────
-    const sphereCount = 3000;
-    const wakeCount   = 1400;
-    const total       = sphereCount + wakeCount;
+    // ── Build Network Sphere ───────────────────────────────────────
+    const sphereGroup = new THREE.Group();
+    scene.add(sphereGroup);
 
-    const positions = new Float32Array(total * 3);
-    const colors    = new Float32Array(total * 3);
+    const RADIUS = 500; 
+    const COUNT = 1200; // Increased density
+    const MAX_CONN_DIST = 90;
 
-    const R = 300; // sphere radius
+    const points = [];
+    const positions = new Float32Array(COUNT * 3);
+    const scatterTargets = new Float32Array(COUNT * 3);
+    const customColors = new Float32Array(COUNT * 3);
+    const roles = new Float32Array(COUNT);
+    const extractStarts = new Float32Array(COUNT);
 
-    // Core sphere — Fibonacci golden-angle distribution
-    for (let i = 0; i < sphereCount; i++) {
-      const phi   = Math.acos(1 - 2 * (i + 0.5) / sphereCount);
-      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-      const noise = 0.88 + Math.random() * 0.24;
-      const r = R * noise;
+    // 1. Generate random points
+    for (let i = 0; i < COUNT; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      
+      const x = RADIUS * Math.sin(phi) * Math.cos(theta);
+      const y = RADIUS * Math.sin(phi) * Math.sin(theta);
+      const z = RADIUS * Math.cos(phi);
+      
+      points.push(new THREE.Vector3(x, y, z));
+      
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
 
-      positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
+      // ALL dots are standard teal variations
+      const b = 0.5 + Math.random() * 0.5;
+      customColors[i * 3]     = 0.36 * b; // #5c939f base
+      customColors[i * 3 + 1] = 0.57 * b;
+      customColors[i * 3 + 2] = 0.62 * b;
 
-      // White → light gray, occasional teal hint
-      const roll = Math.random();
-      const b = 0.45 + Math.random() * 0.55;
-      if (roll < 0.08) {
-        colors[i * 3]     = 0.36 * b;
-        colors[i * 3 + 1] = 0.58 * b;
-        colors[i * 3 + 2] = 0.62 * b; // teal tint
+      if (i === 0) {
+        roles[i] = 0.0; // The Final Surviving Client
+        extractStarts[i] = 0.0; // Constantly travels
+        // Center screen
+        scatterTargets[i * 3] = 0; 
+        scatterTargets[i * 3 + 1] = 0;   
+        scatterTargets[i * 3 + 2] = 250; // Pop aggressively forward
+      } else if (i === 1) {
+        roles[i] = 1.0; // Lead 1 (Left)
+        extractStarts[i] = 0.1;
+        scatterTargets[i * 3] = -250;
+        scatterTargets[i * 3 + 1] = 150;
+        scatterTargets[i * 3 + 2] = 0;
+      } else if (i === 2) {
+        roles[i] = 2.0; // Lead 2 (Top)
+        extractStarts[i] = 0.25;
+        scatterTargets[i * 3] = 0;
+        scatterTargets[i * 3 + 1] = 300;
+        scatterTargets[i * 3 + 2] = 0;
+      } else if (i === 3) {
+        roles[i] = 3.0; // Lead 3 (Right)
+        extractStarts[i] = 0.4;
+        scatterTargets[i * 3] = 250;
+        scatterTargets[i * 3 + 1] = 150;
+        scatterTargets[i * 3 + 2] = 0;
       } else {
-        colors[i * 3]     = b;
-        colors[i * 3 + 1] = b;
-        colors[i * 3 + 2] = b;
+        roles[i] = 4.0; // Irrelevant leads (Scattering)
+        extractStarts[i] = 0.0;
+        
+        // Explode/scatter massively outward
+        const explodeDist = 1500 + Math.random() * 2000;
+        scatterTargets[i * 3]     = x * (explodeDist / RADIUS) + (Math.random() - 0.5) * 500;
+        scatterTargets[i * 3 + 1] = y * (explodeDist / RADIUS) + (Math.random() - 0.5) * 500;
+        scatterTargets[i * 3 + 2] = z * (explodeDist / RADIUS) + (Math.random() - 0.5) * 500;
       }
     }
 
-    // Wake / scattered particles extending outward
-    for (let i = sphereCount; i < total; i++) {
-      const t    = (i - sphereCount) / wakeCount;
-      const phi  = Math.random() * Math.PI;
-      const theta = Math.random() * Math.PI * 2;
-      const r = R * 0.85 + t * 500;
+    // Make the final client start facing the viewer manually for better initial look
+    positions[0] = 0;
+    positions[1] = 0;
+    positions[2] = RADIUS;
+    points[0].set(0, 0, RADIUS);
 
-      positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
-      positions[i * 3 + 2] = r * Math.cos(phi);
+    // 2. Generate connections (lines) between close points
+    const linePairs = [];
+    const linePositions = [];
+    // We do NOT draw lines connected to the Main Client or the 3 Leads originally 
+    // to prevent stretching giant umbilical cords across the screen while they travel
+    const validPointIds = new Set();
+    for (let i = 4; i < COUNT; i++) validPointIds.add(i);
 
-      const b = (1 - t) * 0.28;
-      colors[i * 3]     = b;
-      colors[i * 3 + 1] = b;
-      colors[i * 3 + 2] = b * 1.15; // slight cool tint
+    for (let i = 4; i < COUNT; i++) {
+      let connections = 0;
+      for (let j = i + 1; j < COUNT; j++) {
+        const dist = points[i].distanceTo(points[j]);
+        if (dist < MAX_CONN_DIST && connections < 4) {
+          linePairs.push({ a: i, b: j });
+          linePositions.push(
+            positions[i*3], positions[i*3+1], positions[i*3+2],
+            positions[j*3], positions[j*3+1], positions[j*3+2]
+          );
+          connections++;
+        }
+      }
     }
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color",    new THREE.BufferAttribute(colors, 3));
+    // Pass the scatter target of each point connected by the line
+    const lineScatterTargets = new Float32Array(linePairs.length * 6);
+    
+    for(let k=0; k < linePairs.length; k++) {
+      const {a, b} = linePairs[k];
+      
+      lineScatterTargets[k*6]   = scatterTargets[a*3];
+      lineScatterTargets[k*6+1] = scatterTargets[a*3+1];
+      lineScatterTargets[k*6+2] = scatterTargets[a*3+2];
+      lineScatterTargets[k*6+3] = scatterTargets[b*3];
+      lineScatterTargets[k*6+4] = scatterTargets[b*3+1];
+      lineScatterTargets[k*6+5] = scatterTargets[b*3+2];
+    }
 
-    const material = new THREE.PointsMaterial({
-      size: 2.8,
-      vertexColors: true,
+    // ── Create Custom GPU Shaders ───────────────────────────────────────
+    
+    // POINT SHADER
+    const pointGeo = new THREE.BufferGeometry();
+    pointGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    pointGeo.setAttribute("scatterTarget", new THREE.BufferAttribute(scatterTargets, 3));
+    pointGeo.setAttribute("customColor", new THREE.BufferAttribute(customColors, 3));
+    pointGeo.setAttribute("role", new THREE.BufferAttribute(roles, 1));
+    pointGeo.setAttribute("extractStart", new THREE.BufferAttribute(extractStarts, 1));
+
+    const uniforms = {
+      uProgress: { value: 0.0 },
+      uBaseSize: { value: 35.0 },
+      uMouse: { value: new THREE.Vector2(0, 0) }
+    };
+
+    const pointMat = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader: `
+        attribute vec3 scatterTarget;
+        attribute float role;
+        attribute float extractStart;
+        attribute vec3 customColor;
+        varying vec3 vColor;
+        varying float vAlpha;
+        uniform float uProgress;
+        uniform float uBaseSize;
+        uniform vec2 uMouse;
+
+        void main() {
+          vColor = customColor;
+          
+          vec3 currentPos = position;
+          float alpha = 1.0;
+          float sizeMult = 1.0;
+
+          if (role == 0.0) {
+              // CLIENT: Travels to center gracefully
+              float p = smoothstep(0.0, 1.0, uProgress);
+              currentPos = mix(position, scatterTarget, p);
+              
+              if (uProgress > 0.8) {
+                 // Final flare when leads hit (MASSIVE POPUP)
+                 float p2 = smoothstep(0.8, 1.0, uProgress);
+                 sizeMult = 2.5 + (p2 * p2 * 15.0); // Huge explosion
+                 alpha = 1.0;
+              } else {
+                 sizeMult = 2.5; 
+                 alpha = 0.5; // Dim waiting for data
+              }
+          } 
+          else if (role >= 1.0 && role <= 3.0) {
+              // 3 LEADS: Extract in sequence from globe out to holding spots
+              float p = smoothstep(extractStart, extractStart + 0.35, uProgress);
+              currentPos = mix(position, scatterTarget, p);
+              
+              // Second stage: Converge to client dot at the end!
+              if (uProgress > 0.75) {
+                  float mergeP = smoothstep(0.75, 0.95, uProgress);
+                  currentPos = mix(currentPos, vec3(0.0, 0.0, 250.0), mergeP);
+                  // Fade out as they merge directly into client
+                  alpha = 1.0 - smoothstep(0.85, 0.95, uProgress);
+              }
+              
+              sizeMult = 1.5 + p * 3.5; 
+          }
+          else {
+              // REJECTED LEADS: Explode out & fade
+              float shoot = uProgress * uProgress; 
+              currentPos = mix(position, scatterTarget, shoot);
+              
+              alpha = 1.0 - shoot;
+              sizeMult = 1.0 + (shoot * 3.0); 
+          }
+          
+          vAlpha = alpha;
+
+          vec4 mvPosition = modelViewMatrix * vec4(currentPos, 1.0);
+          
+          gl_PointSize = uBaseSize * sizeMult * alpha * (300.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vAlpha;
+        
+        void main() {
+          if (vAlpha <= 0.01) discard;
+          
+          // Create a soft circle
+          vec2 xy = gl_PointCoord.xy - vec2(0.5);
+          float ll = length(xy);
+          if (ll > 0.5) discard;
+          
+          // Soft glow
+          float glow = (0.5 - ll) * 2.0;
+          gl_FragColor = vec4(vColor * glow, vAlpha * glow);
+        }
+      `,
       transparent: true,
-      opacity: 0.85,
-      sizeAttenuation: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
 
-    const sphere = new THREE.Points(geometry, material);
-    scene.add(sphere);
+    const pointMesh = new THREE.Points(pointGeo, pointMat);
+    sphereGroup.add(pointMesh);
 
-    // ── Mouse tracking ─────────────────────────────────────────────────
-    let mouseX = 0, mouseY = 0;
-    const handleMouse = (e) => {
-      mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    // LINE SHADER (connects scattering points cleanly until they fade out)
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+    lineGeo.setAttribute("scatterTarget", new THREE.BufferAttribute(lineScatterTargets, 3));
+    
+    // Standard connection lines (for scattering rejected leads)
+    const lineUniforms = {
+      uProgress: { value: 0.0 },
+      uColor: { value: new THREE.Color(0x5c939f) }
     };
-    window.addEventListener("mousemove", handleMouse);
 
-    // ── Animation loop ─────────────────────────────────────────────────
+    const lineMat = new THREE.ShaderMaterial({
+      uniforms: lineUniforms,
+      vertexShader: `
+        attribute vec3 scatterTarget;
+        varying float vAlpha;
+        uniform float uProgress;
+
+        void main() {
+          vec3 currentPos = position;
+          float alpha = 0.35; // Base brightness
+          
+          float shoot = uProgress * uProgress;
+          currentPos = mix(position, scatterTarget, shoot);
+          alpha = 0.35 * (1.0 - shoot);
+
+          vAlpha = alpha;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(currentPos, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        varying float vAlpha;
+
+        void main() {
+          if (vAlpha <= 0.01) discard;
+          gl_FragColor = vec4(uColor, vAlpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    
+    const lineMesh = new THREE.LineSegments(lineGeo, lineMat);
+    sphereGroup.add(lineMesh);
+
+    // DYNAMIC CONNECTION LINES (Beams from Leads to Client at the end)
+    const mainBeamsGeo = new THREE.BufferGeometry();
+    const beamPositions = [];
+    
+    // WebGL wireframes are max 1px wide. We simulate a bolder, thicker beam 
+    // by drawing multiple overlapping lines with tiny sub-pixel offsets.
+    const offsets = [
+        [0,0,0], [1,1,0], [-1,-1,0], [1,-1,0], [-1,1,0],
+        [2,0,0], [-2,0,0], [0,2,0], [0,-2,0], [3,0,0], [-3,0,0], [0,3,0], [0,-3,0]
+    ];
+    
+    for (const off of offsets) {
+      beamPositions.push(
+         // Lead 1 to Client
+         scatterTargets[1*3] + off[0], scatterTargets[1*3+1] + off[1], scatterTargets[1*3+2] + off[2],
+         0 + off[0], off[1], 250 + off[2],
+         // Lead 2 to Client
+         scatterTargets[2*3] + off[0], scatterTargets[2*3+1] + off[1], scatterTargets[2*3+2] + off[2],
+         0 + off[0], off[1], 250 + off[2],
+         // Lead 3 to Client
+         scatterTargets[3*3] + off[0], scatterTargets[3*3+1] + off[1], scatterTargets[3*3+2] + off[2],
+         0 + off[0], off[1], 250 + off[2]
+      );
+    }
+    
+    const beamPositionsArray = new Float32Array(beamPositions);
+    mainBeamsGeo.setAttribute("position", new THREE.BufferAttribute(beamPositionsArray, 3));
+
+    const mainBeamsMat = new THREE.ShaderMaterial({
+      uniforms: {
+         uProgress: { value: 0.0 },
+         uColor: { value: new THREE.Color(0xffffff) }
+      },
+      vertexShader: `
+        uniform float uProgress;
+        varying float vAlpha;
+        void main() {
+           // Wait until uProgress > 0.75 when Leads are fully extracted
+           // Display the beam until uProgress 0.95 when they merge
+           float alpha = 0.0;
+           if (uProgress > 0.75 && uProgress < 0.95) {
+               alpha = smoothstep(0.75, 0.85, uProgress) * smoothstep(0.95, 0.9, uProgress);
+               alpha *= 1.2; // Extra brightness multiplier for boldness
+           }
+           vAlpha = alpha;
+           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        varying float vAlpha;
+        void main() {
+           if (vAlpha <= 0.01) discard;
+           gl_FragColor = vec4(uColor, vAlpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    
+    const mainBeams = new THREE.LineSegments(mainBeamsGeo, mainBeamsMat);
+    sphereGroup.add(mainBeams);
+
+
+    // Position globe in the center, deep behind texts
+    sphereGroup.position.set(0, 0, -300);
+
+    // ── Scroll Animation Logistics ────────────────────────────────
+    const scrollData = { progress: 0 };
+    const heroSection = container.closest("section");
+    if (heroSection) {
+      gsap.to(scrollData, {
+        progress: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroSection,
+          start: "top top",
+          end: "+=150%",
+          scrub: 1,
+        }
+      });
+      // Camera is static now, all zooming/animating is natively embedded in shader logic.
+    }
+
+    // ── Mouse Parallax ──────────────────────────────────────────────
+    const mouse = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
+
+    const handleMouseMove = (e) => {
+      const rect = container.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    };
+    container.addEventListener("mousemove", handleMouseMove);
+
+    // ── Animate ──────────────────────────────────────────────────────
     let raf;
-    const clock = new THREE.Clock();
-    let rotX = 0, rotY = 0;
-
+    let baseRotationY = 0;
+    
     const animate = () => {
       raf = requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
 
-      // Target rotation: gentle auto-spin + strong mouse influence
-      const targetRotY = t * 0.05 + mouseX * 0.55;
-      const targetRotX = mouseY * 0.35;
+      const p = scrollData.progress;
+      
+      // Sync scroll progress and mouse coordinates to GPU
+      uniforms.uProgress.value = p;
+      
+      lineUniforms.uProgress.value = p;
+      mainBeamsMat.uniforms.uProgress.value = p;
 
-      rotY += (targetRotY - rotY) * 0.035;
-      rotX += (targetRotX - rotX) * 0.035;
+      // Decrease rotation speed significantly as they explode out
+      const rotationSpeed = 0.001 * (1.0 - p); 
+      baseRotationY -= rotationSpeed;
 
-      sphere.rotation.y = rotY;
-      sphere.rotation.x = rotX;
-
-      // Camera drift for parallax depth
-      camera.position.x += (mouseX * 100 - camera.position.x) * 0.045;
-      camera.position.y += (-mouseY * 80  - camera.position.y) * 0.045;
-      camera.lookAt(scene.position);
+      // Smooth mouse parallax tilt (dampens out as scroll happens)
+      target.x = mouse.x * 0.15 * (1.0 - p); 
+      target.y = mouse.y * 0.15 * (1.0 - p);
+      
+      sphereGroup.rotation.y += (baseRotationY + target.x - sphereGroup.rotation.y) * 0.05;
+      sphereGroup.rotation.x += (-target.y - sphereGroup.rotation.x) * 0.05;
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // ── Resize ─────────────────────────────────────────────────────────
-    const handleResize = () => {
+    // ── Resize ───────────────────────────────────────────────────────
+    const onResize = () => {
       const w = container.clientWidth;
       const h = container.clientHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", onResize);
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", handleMouse);
-      window.removeEventListener("resize", handleResize);
+      container.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", onResize);
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
-      geometry.dispose();
-      material.dispose();
+      pointGeo.dispose();
+      pointMat.dispose();
+      lineGeo.dispose();
+      lineMat.dispose();
+      mainBeamsGeo.dispose();
+      mainBeamsMat.dispose();
       renderer.dispose();
     };
   }, []);
@@ -156,8 +452,8 @@ export default function ParticleCanvas() {
   return (
     <div
       ref={mountRef}
-      className="absolute inset-0 z-0"
-      style={{ willChange: "transform", pointerEvents: "none" }}
+      className="absolute inset-0 z-0 pointer-events-auto"
+      style={{ willChange: "transform" }}
       aria-hidden="true"
     />
   );

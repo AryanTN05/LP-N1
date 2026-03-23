@@ -10,7 +10,8 @@
       "Read(//Users/aryantn/.nvm/versions/node/**)",
       "Read(//opt/homebrew/bin/**)",
       "Read(//usr/**)",
-      "Bash(/Users/aryantn/.nvm/versions/node/v24.14.0/bin/npm install:*)"
+      "Bash(/Users/aryantn/.nvm/versions/node/v24.14.0/bin/npm install:*)",
+      "WebSearch"
     ]
   }
 }
