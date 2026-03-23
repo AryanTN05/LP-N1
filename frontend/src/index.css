@@ -8,7 +8,7 @@
 /* ═══════════════ CSS VARIABLES ═══════════════ */
 :root {
   /* Legacy */
-  --bg-dark: #000000;
+  --bg-dark: #111111;
   --bg-light: #e8e8e8;
   --text-dark: #111111;
   --text-light: #ffffff;
@@ -177,10 +177,10 @@ body {
 .ethos-card-black, .ethos-card-black h3, .ethos-card-black p, .ethos-card-black span { color: #ffffff !important; }
 
 .ethos-card-teal { background: #5f8f8a; }
-.ethos-card-teal, .ethos-card-teal h3, .ethos-card-teal p, .ethos-card-teal span { color: #ffffff !important; }
+.ethos-card-teal, .ethos-card-teal h3, .ethos-card-teal p, .ethos-card-teal span { color: #0a0a0a !important; }
 
 .ethos-card-orange { background: #d4785c; }
-.ethos-card-orange, .ethos-card-orange h3, .ethos-card-orange p, .ethos-card-orange span { color: #ffffff !important; }
+.ethos-card-orange, .ethos-card-orange h3, .ethos-card-orange p, .ethos-card-orange span { color: #0a0a0a !important; }
 
 .ethos-card-light { background: #c8c8c8; }
 .ethos-card-light, .ethos-card-light h3, .ethos-card-light p, .ethos-card-light span { color: #111111 !important; }
@@ -188,22 +188,23 @@ body {
 /* Dot-art inside cards */
 .dot-art {
   position: absolute;
-  bottom: 1rem;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%) scale(0.9);
+  transform: translate(-50%, -40%) scale(0.9);
   width: 85%;
   height: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.5;
+  opacity: 0.35;
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+  z-index: 0;
 }
 
 .ethos-card:hover .dot-art {
-  opacity: 0.85;
-  transform: translateX(-50%) scale(1.05);
+  opacity: 0.6;
+  transform: translate(-50%, -40%) scale(1.05);
 }
 
 .dot-art-grid {

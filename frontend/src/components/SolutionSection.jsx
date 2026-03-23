@@ -36,7 +36,14 @@ export default function SolutionSection() {
         { y: 0, opacity: 1, duration: 0.6, ease: "power3.out",
           scrollTrigger: { trigger: sectionRef.current, start: "top 78%", once: true } }
       );
-      if (headingRef.current) animateTextReveal(headingRef.current);
+      if (headingRef.current) {
+        gsap.fromTo(
+          headingRef.current,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, ease: "power3.out",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 76%", once: true } }
+        );
+      }
       gsap.fromTo(
         ".solution-desc",
         { y: 20, opacity: 0 },
@@ -54,13 +61,14 @@ export default function SolutionSection() {
       data-testid="solution-section"
       className="py-32 lg:py-44 px-6 relative z-10"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Heading */}
         <div className="text-center mb-20">
           <span className="solution-label section-label-dark mb-4 block">The Solution</span>
           <h2
             ref={headingRef}
-            className="font-heading text-4xl sm:text-5xl lg:text-7xl uppercase tracking-wide leading-tight text-zinc-900"
+            className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide leading-tight text-zinc-900"
+            style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
           >
             Qualified Leads Delivered to Your Inbox
           </h2>
@@ -70,7 +78,7 @@ export default function SolutionSection() {
         </div>
 
         {/* WQF accordion focus list */}
-        <div className="max-w-2xl mx-auto">
+        <div className="mx-auto">
           {focusItems.map((item, i) => (
             <div
               key={i}
@@ -78,13 +86,13 @@ export default function SolutionSection() {
               onMouseEnter={() => setActiveIndex(i)}
               onMouseLeave={() => setActiveIndex(null)}
             >
-              <div className="flex items-baseline gap-4">
+              <div className="flex items-baseline justify-center gap-4">
                 <span className="font-mono text-[10px] tracking-widest text-zinc-400">
                   0{i + 1}
                 </span>
                 <h3>{item.label}</h3>
               </div>
-              <p className="ml-10">{item.desc}</p>
+              <p className="text-center mt-2 max-w-xl mx-auto">{item.desc}</p>
             </div>
           ))}
         </div>

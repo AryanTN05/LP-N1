@@ -85,7 +85,7 @@ export default function HeroSection() {
                 data-testid="hero-cta"
                 className="btn-bracket text-white"
               >
-                Book a Free Audit
+                Book an Audit
                 <ArrowRight className="w-4 h-4" />
               </a>
             </div>

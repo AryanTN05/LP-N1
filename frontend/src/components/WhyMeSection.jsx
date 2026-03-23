@@ -16,7 +16,7 @@ const slides = [
     title: "AI-Native Architecture",
     tag: "Technology",
     color: "#5f8f8a",
-    accent: "#ffffff",
+    accent: "#0a0a0a",
     desc: "Every system is built custom with Claude, n8n, Clay, and Apollo — engineered for your specific ICP, not cookie-cutter templates.",
   },
   {
@@ -32,7 +32,7 @@ const slides = [
     title: "Fast Execution",
     tag: "Speed",
     color: "#d4785c",
-    accent: "#ffffff",
+    accent: "#0a0a0a",
     desc: "Infrastructure built in 2 weeks. Campaigns live by week 3. First qualified leads before day 30.",
   },
   {
@@ -72,7 +72,7 @@ function TiltCard({ slide, isActive, onClick }) {
     });
   }, []);
 
-  const textColor = slide.color === "#c8c8c8" || slide.color === "#5f8f8a" ? "#ffffff" : "#ffffff";
+  const textColor = ["#c8c8c8", "#d4785c", "#5f8f8a"].includes(slide.color) ? "#0a0a0a" : "#ffffff";
 
   return (
     <div

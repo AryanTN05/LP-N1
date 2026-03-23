@@ -40,7 +40,14 @@ export default function PainPointsSection() {
         { y: 0, opacity: 1, duration: 0.6, ease: "power3.out",
           scrollTrigger: { trigger: sectionRef.current, start: "top 78%", once: true } }
       );
-      if (headingRef.current) animateTextReveal(headingRef.current);
+      if (headingRef.current) {
+        gsap.fromTo(
+          headingRef.current,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, ease: "power3.out",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 76%", once: true } }
+        );
+      }
       gsap.fromTo(
         ".ethos-card",
         { y: 60, opacity: 0 },
@@ -91,7 +98,7 @@ export default function PainPointsSection() {
                 </span>
                 <h3 className="mt-3">{card.title}</h3>
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-widest opacity-70 leading-relaxed mt-4">
+              <p className="font-mono text-[10px] uppercase tracking-widest opacity-70 leading-relaxed mt-4" style={{ position: "relative", zIndex: 1 }}>
                 {card.desc}
               </p>
               <div className="dot-art">

@@ -30,7 +30,7 @@ const LandingPage = () => {
     const wipeEl = document.getElementById("light-wipe");
     if (!wipeEl) return;
 
-    gsap.set(wipeEl, { clipPath: "inset(100% 0 0% 0)" });
+    gsap.set(wipeEl, { clipPath: "inset(0 100% 0 0)" });
 
     const trigger = ScrollTrigger.create({
       trigger: "#hero-sentinel",
@@ -39,10 +39,10 @@ const LandingPage = () => {
       scrub: 0.6,
       onUpdate: (self) => {
         const pct = (1 - self.progress) * 100;
-        wipeEl.style.clipPath = `inset(${pct.toFixed(2)}% 0 0% 0)`;
+        wipeEl.style.clipPath = `inset(0 ${pct.toFixed(2)}% 0 0)`;
       },
       onLeave: () => {
-        wipeEl.style.clipPath = "inset(0% 0 0% 0)";
+        wipeEl.style.clipPath = "inset(0 0% 0 0)";
       },
       onEnterBack: () => {
         // Let scrub re-take control
@@ -53,7 +53,7 @@ const LandingPage = () => {
   }, [preloaderDone]);
 
   return (
-    <div className="min-h-screen bg-black relative" data-testid="landing-page">
+    <div className="min-h-screen relative" style={{ background: "var(--rich-carbon)" }} data-testid="landing-page">
       <GrainOverlay />
 
       {!preloaderDone && <Preloader onComplete={() => setPreloaderDone(true)} />}
