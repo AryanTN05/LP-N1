@@ -103,25 +103,25 @@ export default function HeroSection() {
                 className="w-1.5 h-1.5 rounded-full"
                 style={{ background: "var(--electric-teal)", boxShadow: "0 0 8px rgba(92,147,159,0.8)" }}
               />
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-zinc-400">
+              <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-300">
                 Make AI Your Default Setting
               </span>
             </div>
 
             <p
               data-testid="hero-subtext"
-              className="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 leading-relaxed mb-8"
+              className="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-300 leading-relaxed mb-8"
             >
               Stop manual prospecting. I build autonomous AI systems that find, qualify,
               and book meetings with your ideal clients — so you focus on closing.
             </p>
 
             {/* Tool stack */}
-            <div className="flex flex-wrap md:justify-end gap-x-4 gap-y-2 opacity-25">
+            <div className="flex flex-wrap md:justify-end gap-x-4 gap-y-2">
               {tools.map((tool) => (
                 <span
                   key={tool}
-                  className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-400"
+                  className="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400"
                 >
                   {tool}
                 </span>

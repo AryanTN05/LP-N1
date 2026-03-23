@@ -43,7 +43,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   color: var(--text-light);
   background: var(--bg-dark);
   overflow-x: hidden;
@@ -52,20 +52,21 @@ body {
 }
 
 /* ═══════════════ TYPOGRAPHY ═══════════════ */
-.font-heading { font-family: 'DM Serif Display', serif; }
-.font-mono { font-family: 'Space Mono', monospace; }
+.font-heading { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+.font-mono { font-family: 'Space Mono', monospace; font-weight: 700; }
 
 .section-label {
   font-family: 'Space Mono', monospace;
+  font-weight: 700;
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.55);
   display: block;
 }
 
 .section-label-dark {
-  color: rgba(0,0,0,0.35);
+  color: rgba(0,0,0,0.5);
 }
 
 .text-gradient-teal {
@@ -86,14 +87,15 @@ body {
   color: var(--text-dark);
 }
 
-/* ═══════════════ BRACKET BUTTON (WQF exact) ═══════════════ */
+/* ═══════════════ BRACKET BUTTON ═══════════════ */
 .btn-bracket {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  font-family: 'Space Mono', monospace;
-  font-size: 0.7rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   padding: 1rem 2rem;
@@ -102,42 +104,84 @@ body {
   cursor: pointer;
   background: transparent;
   border: none;
-  transition: color 0.3s ease;
+  transition:
+    padding-left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    text-shadow 0.3s ease;
 }
 
-.btn-bracket::before,
+/* Top-left bracket → morphs into dot on hover */
+.btn-bracket::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-top: 1.5px solid currentColor;
+  border-left: 1.5px solid currentColor;
+  background: transparent;
+  transform: translateY(0);
+  transition:
+    top    0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    left   0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    width  0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-top-width  0.25s ease,
+    border-left-width 0.25s ease,
+    background 0.25s ease,
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Bottom-right bracket → morphs into underline on hover */
 .btn-bracket::after {
   content: '';
   position: absolute;
+  bottom: 0;
+  right: 0;
+  left: auto;
   width: 14px;
   height: 14px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-bracket::before {
-  top: 0; left: 0;
-  border-top: 1.5px solid currentColor;
-  border-left: 1.5px solid currentColor;
-}
-
-.btn-bracket::after {
-  bottom: 0; right: 0;
   border-bottom: 1.5px solid currentColor;
   border-right: 1.5px solid currentColor;
+  background: transparent;
+  transition:
+    width  0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.35s ease,
+    right  0.35s ease,
+    bottom 0.35s ease,
+    border-bottom-width 0.25s ease,
+    border-right-width  0.25s ease,
+    background 0.25s ease;
 }
 
+/* HOVER — dot */
 .btn-bracket:hover::before {
-  top: -5px; left: -5px;
-  border-color: var(--accent-teal);
+  top: 50%;
+  left: 1rem;
+  width: 7px;
+  height: 7px;
+  border-top-width: 0;
+  border-left-width: 0;
+  background: currentColor;
+  transform: translateY(-50%);
 }
 
+/* HOVER — underline (expands right → left) */
 .btn-bracket:hover::after {
-  bottom: -5px; right: -5px;
-  border-color: var(--accent-teal);
+  bottom: 7px;
+  right: 2rem;
+  left: auto;
+  width: calc(100% - 4rem);
+  height: 1.5px;
+  border-bottom-width: 0;
+  border-right-width: 0;
+  background: currentColor;
 }
 
+/* HOVER — text shifts right for dot + glows */
 .btn-bracket:hover {
-  color: var(--accent-teal);
+  padding-left: 2.8rem;
+  text-shadow: 0 0 10px currentColor, 0 0 22px currentColor;
 }
 
 /* ═══════════════ FLEX-GROW ETHOS CARDS (WQF exact) ═══════════════ */
@@ -165,12 +209,16 @@ body {
 }
 
 .ethos-card h3 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
   font-size: 1.4rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   line-height: 1.2;
   white-space: pre-line;
+}
+
+.ethos-card p {
+  opacity: 0.85 !important;
 }
 
 .ethos-card-black { background: #0a0a0a; }
@@ -254,7 +302,7 @@ body {
 }
 
 .focus-list-item h3 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
   font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -442,7 +490,7 @@ html.lenis, html.lenis body { height: auto; }
   gap: 2rem;
 }
 .preloader-name {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
   font-size: clamp(2rem, 6vw, 4rem);
   color: var(--off-white);
   text-transform: uppercase;
@@ -474,9 +522,10 @@ html.lenis, html.lenis body { height: auto; }
 /* ═══════════════ NAV LINK UNDERLINE ═══════════════ */
 .nav-link {
   position: relative;
-  color: var(--pulse-ash);
+  color: rgba(255,255,255,0.65);
   transition: color 0.3s var(--easing);
   font-family: 'Space Mono', monospace;
+  font-weight: 700;
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
@@ -519,7 +568,7 @@ html.lenis, html.lenis body { height: auto; }
   transform: translateX(0);
 }
 .mobile-menu-link {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
   font-size: clamp(2.5rem, 8vw, 5rem);
   color: var(--off-white);
   text-decoration: none;
