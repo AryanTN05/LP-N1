@@ -98,7 +98,7 @@ export default function PainPointsSection() {
                 </span>
                 <h3 className="mt-3">{card.title}</h3>
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-widest opacity-70 leading-relaxed mt-4" style={{ position: "relative", zIndex: 1 }}>
+              <p className="font-mono text-[12px] uppercase tracking-wider leading-relaxed mt-4" style={{ position: "relative", zIndex: 1 }}>
                 {card.desc}
               </p>
               <div className="dot-art">

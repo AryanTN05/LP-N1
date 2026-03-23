@@ -58,15 +58,15 @@ body {
 .section-label {
   font-family: 'Space Mono', monospace;
   font-weight: 700;
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.7);
   display: block;
 }
 
 .section-label-dark {
-  color: rgba(0,0,0,0.5);
+  color: rgba(0,0,0,0.65);
 }
 
 .text-gradient-teal {
@@ -201,11 +201,21 @@ body {
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  transition: flex 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: flex 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease;
 }
 
 .ethos-card:hover {
   flex: 1.8;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .ethos-card h3 {
@@ -340,23 +350,35 @@ body {
 
 /* ═══════════════ GLASS CARD (dark sections) ═══════════════ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
+  background: rgba(18, 18, 20, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(94, 234, 212, 0.15);
+  border-color: rgba(92, 147, 159, 0.22);
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(92, 147, 159, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* ═══════════════ LIGHT CARD ═══════════════ */
 .light-card {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.75);
   border-radius: 1.25rem;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -596,11 +618,19 @@ html.lenis, html.lenis body { height: auto; }
 /* ═══════════════ 3D CARD TILT ═══════════════ */
 .tilt-card {
   transform-style: preserve-3d;
-  transition: box-shadow 0.3s var(--easing);
   will-change: transform;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: box-shadow 0.35s var(--easing), border-color 0.35s ease;
 }
 .tilt-card:hover {
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(92,147,159,0.15);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(92, 147, 159, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* ═══════════════ MAGNETIC BUTTON WRAPPER ═══════════════ */
@@ -672,12 +702,15 @@ html.lenis, html.lenis body { height: auto; }
   display: inline-flex;
   align-items: center;
   gap: 1.5rem;
-  background: rgba(17, 17, 17, 0.95);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(14, 14, 16, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 100px;
   padding: 0.6rem 1.25rem;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 .nav-pill .nav-link {
   color: rgba(255,255,255,0.5);

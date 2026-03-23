@@ -123,7 +123,7 @@ export default function ProcessSection() {
                   <h3 className="font-heading text-2xl uppercase tracking-wide text-white mb-2 group-hover:text-[#5c939f] transition-colors duration-300">
                     {step.title}
                   </h3>
-                  <p className="text-sm text-zinc-400 leading-relaxed max-w-lg">{step.desc}</p>
+                  <p className="text-base text-zinc-300 leading-relaxed max-w-lg">{step.desc}</p>
                 </div>
               </div>
             ))}

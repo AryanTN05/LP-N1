@@ -98,7 +98,7 @@ export default function ResultsSection() {
                 <h3 className="font-heading text-xl uppercase tracking-wide text-white mb-3">
                   {card.title}
                 </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
+                <p className="text-base text-zinc-300 leading-relaxed">
                   {card.desc}
                 </p>
               </div>

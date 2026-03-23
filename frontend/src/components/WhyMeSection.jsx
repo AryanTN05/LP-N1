@@ -106,7 +106,7 @@ function TiltCard({ slide, isActive, onClick }) {
             {slide.title}
           </h3>
           <p
-            className={`text-sm leading-relaxed transition-all duration-500 ${
+            className={`text-base leading-relaxed transition-all duration-500 ${
               isActive ? "opacity-80 max-h-40" : "opacity-0 max-h-0 overflow-hidden"
             }`}
           >

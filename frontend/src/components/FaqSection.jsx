@@ -75,7 +75,7 @@ function FaqItem({ faq, index, isActive, onToggle }) {
 
       <div ref={contentRef} style={{ height: 0, overflow: "hidden", opacity: 0 }}>
         <div ref={innerRef} className="pb-6 pl-9">
-          <p className="text-sm text-zinc-400 leading-relaxed">{faq.a}</p>
+          <p className="text-base text-zinc-300 leading-relaxed">{faq.a}</p>
         </div>
       </div>
     </div>
