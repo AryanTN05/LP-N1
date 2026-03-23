@@ -73,7 +73,9 @@ export default function Navbar() {
       gsap.to(navRef.current, {
         opacity: 0, y: -8,
         duration: 0.45, ease: "power3.inOut",
+        onComplete: () => { if (navRef.current) navRef.current.style.pointerEvents = "none"; },
       });
+      pillRef.current.style.pointerEvents = "auto";
       gsap.fromTo(
         pillRef.current,
         { opacity: 0, y: -16, scale: 0.96 },
@@ -83,7 +85,9 @@ export default function Navbar() {
       gsap.to(pillRef.current, {
         opacity: 0, y: -10, scale: 0.96,
         duration: 0.3, ease: "power2.in",
+        onComplete: () => { if (pillRef.current) pillRef.current.style.pointerEvents = "none"; },
       });
+      navRef.current.style.pointerEvents = "auto";
       gsap.to(navRef.current, {
         opacity: 1, y: 0,
         duration: 0.5, ease: "power3.out", delay: 0.08,
@@ -182,6 +186,7 @@ export default function Navbar() {
           WebkitBackdropFilter: "blur(28px) saturate(180%)",
           border: "1px solid rgba(255,255,255,0.1)",
           opacity: 0,
+          pointerEvents: "none",
           boxShadow: "0 4px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
       >
@@ -210,7 +215,7 @@ export default function Navbar() {
           href={CAL_LINK}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-[10px] uppercase tracking-[0.18em] text-white px-4 py-1.5 rounded-full transition-all"
+          className="pill-cta font-mono text-[10px] uppercase tracking-[0.18em] text-white px-4 py-1.5 rounded-full"
           style={{ background: "var(--electric-teal)" }}
         >
           Book a Call
