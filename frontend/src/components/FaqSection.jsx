@@ -52,7 +52,7 @@ function FaqItem({ faq, index, isActive, onToggle }) {
       style={{ opacity: 1 }}
     >
       <button
-        className="w-full flex items-start justify-between gap-4 py-6 text-left group"
+        className="w-full flex items-start justify-between gap-4 py-4 sm:py-5 md:py-6 text-left group"
         onClick={() => onToggle(index)}
         aria-expanded={isActive}
       >
@@ -61,7 +61,7 @@ function FaqItem({ faq, index, isActive, onToggle }) {
             {String(index + 1).padStart(2, "0")}
           </span>
           <span
-            className={`font-heading text-lg uppercase tracking-wide transition-colors duration-300 ${
+            className={`font-heading text-sm sm:text-base md:text-lg uppercase tracking-wide transition-colors duration-300 ${
               isActive ? "text-[#5c939f]" : "text-white group-hover:text-zinc-300"
             }`}
           >
@@ -74,8 +74,8 @@ function FaqItem({ faq, index, isActive, onToggle }) {
       </button>
 
       <div ref={contentRef} style={{ height: 0, overflow: "hidden", opacity: 0 }}>
-        <div ref={innerRef} className="pb-6 pl-9">
-          <p className="text-base text-zinc-300 leading-relaxed">{faq.a}</p>
+        <div ref={innerRef} className="pb-4 sm:pb-5 md:pb-6 pl-6 sm:pl-8 md:pl-9">
+          <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">{faq.a}</p>
         </div>
       </div>
     </div>
@@ -124,7 +124,7 @@ export default function FaqSection() {
           <span className="faq-label section-label mb-4 block">FAQ</span>
           <h2
             ref={headingRef}
-            className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide text-white"
+            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-white"
           >
             Common Questions
           </h2>

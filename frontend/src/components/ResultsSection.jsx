@@ -14,7 +14,7 @@ const cards = [
     num: "02",
     title: "5–15% Reply Rates",
     desc: "AI-personalized outreach that resonates. Not generic templates — messages written around each prospect's specific context, company, and pain.",
-    color: "rgba(212,120,92,0.88)",
+    color: "rgba(237,109,64,0.88)",
     accent: "#0a0a0a",
     textColor: "#0a0a0a",
   },
@@ -77,7 +77,7 @@ export default function ResultsSection() {
           <span className="results-label section-label mb-4 block">What You Get</span>
           <h2
             ref={headingRef}
-            className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide text-white leading-tight"
+            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-white leading-tight"
           >
             Results That Actually Matter
           </h2>
@@ -93,7 +93,7 @@ export default function ResultsSection() {
         </div>
 
         {/* WQF numbered cards */}
-        <div className="results-cards grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="results-cards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {cards.map((card, i) => (
             <div
               key={i}

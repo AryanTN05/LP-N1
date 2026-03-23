@@ -23,7 +23,7 @@ const slides = [
     num: "03",
     title: "Full Transparency",
     tag: "Ownership",
-    color: "#d4785c",
+    color: "#ed6d40",
     accent: "#0a0a0a",
     desc: "You get access to every workflow, every metric, every campaign. No black boxes, no gatekeeping. It's your system.",
   },
@@ -46,7 +46,7 @@ const slides = [
 ];
 
 function TiltCard({ slide, isActive, onClick }) {
-  const textColor = ["#5f8f8a", "#d4785c"].includes(slide.color) ? "#0a0a0a" : "#ffffff";
+  const textColor = ["#5f8f8a", "#ed6d40"].includes(slide.color) ? "#0a0a0a" : "#ffffff";
   const isLight = textColor === "#0a0a0a";
 
   return (
@@ -55,7 +55,7 @@ function TiltCard({ slide, isActive, onClick }) {
       onClick={onClick}
     >
       <div
-        className="hover-card-dark h-full min-h-[380px] md:min-h-[480px] rounded-[20px] p-8 md:p-10 flex flex-col justify-between cursor-pointer"
+        className="hover-card-dark h-full min-h-[340px] sm:min-h-[400px] md:min-h-[440px] lg:min-h-[480px] rounded-[20px] p-6 sm:p-8 lg:p-10 flex flex-col justify-between cursor-pointer"
         style={{
           background: `${slide.color}e6`,
           backdropFilter: "blur(28px) saturate(160%)",
@@ -163,7 +163,7 @@ export default function WhyMeSection() {
             <span className="why-label section-label-dark mb-4 block">Why Work With Me</span>
             <h2
               ref={headingRef}
-              className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide leading-tight text-zinc-900"
+              className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-wide leading-tight text-zinc-900"
             >
               Not Another Agency
             </h2>

@@ -74,7 +74,7 @@ export default function PainPointsSection() {
             <span className="ethos-label section-label-dark mb-4 block">Does this feel like you?</span>
             <h2
               ref={headingRef}
-              className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide leading-tight text-zinc-900"
+              className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide leading-tight text-zinc-900"
             >
               Most B2B Founders Are Stuck.
             </h2>

@@ -74,7 +74,7 @@ export default function HeroSection() {
           />
           <span
             className="font-mono uppercase tracking-[0.2em]"
-            style={{ fontSize: "15px", fontWeight: 700, color: "var(--electric-teal)" }}
+            style={{ fontSize: "clamp(12px, 1.8vw, 15px)", fontWeight: 700, color: "var(--electric-teal)" }}
           >
             Make AI Your Default Setting
           </span>
@@ -86,7 +86,7 @@ export default function HeroSection() {
           <p
             data-testid="hero-subtext"
             className="text-right text-zinc-400"
-            style={{ fontSize: "15.5px", fontWeight: 400, lineHeight: "1.85", letterSpacing: "0.01em" }}
+            style={{ fontSize: "clamp(13px, 1.8vw, 15.5px)", fontWeight: 400, lineHeight: "1.85", letterSpacing: "0.01em" }}
           >
             <span className="text-white font-medium block mb-2">Stop manual prospecting.</span>
             I build <span className="text-[var(--electric-teal)] font-medium">autonomous AI systems</span><br />
@@ -106,7 +106,7 @@ export default function HeroSection() {
           <span
             key={tool}
             className="font-mono uppercase tracking-[0.2em] text-zinc-500"
-            style={{ fontSize: "11px", writingMode: "vertical-rl", letterSpacing: "0.2em" }}
+            style={{ fontSize: "clamp(9px, 1.2vw, 11px)", writingMode: "vertical-rl", letterSpacing: "0.2em" }}
           >
             {tool}
           </span>
@@ -123,12 +123,12 @@ export default function HeroSection() {
           style={{ lineHeight: "0.9" }}
         >
           <div ref={leftBlockRef} className="text-left w-full text-white">
-            <span className="block text-[3.5rem] md:text-[5.5rem] lg:text-[7.5rem] font-bold tracking-tighter">BUILD YOUR</span>
-            <span className="block text-[3.5rem] md:text-[5.5rem] lg:text-[7.5rem] font-bold tracking-tighter">ENTIRE AI</span>
+            <span className="block text-[clamp(2.5rem,8vw,7.5rem)] font-bold tracking-tighter">BUILD YOUR</span>
+            <span className="block text-[clamp(2.5rem,8vw,7.5rem)] font-bold tracking-tighter">ENTIRE AI</span>
           </div>
           <div ref={rightBlockRef} className="text-left w-full text-[#5c939f]">
-            <span className="block text-[3.5rem] md:text-[5.5rem] lg:text-[7.5rem] font-bold tracking-tighter">LEAD GEN</span>
-            <span className="block text-[3.5rem] md:text-[5.5rem] lg:text-[7.5rem] font-bold tracking-tighter">SYSTEM</span>
+            <span className="block text-[clamp(2.5rem,8vw,7.5rem)] font-bold tracking-tighter">LEAD GEN</span>
+            <span className="block text-[clamp(2.5rem,8vw,7.5rem)] font-bold tracking-tighter">SYSTEM</span>
           </div>
         </h1>
 

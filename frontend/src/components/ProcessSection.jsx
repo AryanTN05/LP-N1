@@ -17,7 +17,7 @@ const steps = [
     number: "02",
     title: "Infrastructure Build",
     desc: "I set up your complete AI sales stack — domains, inbox warming, deliverability, Clay enrichment flows, Apollo prospecting, n8n automations, CRM, and Slack notifications.",
-    color: "rgba(212,120,92,0.88)",
+    color: "rgba(237,109,64,0.88)",
     accent: "#0a0a0a",
     textColor: "#0a0a0a",
   },
@@ -115,7 +115,7 @@ export default function ProcessSection() {
           <span className="process-label section-label mb-4 block">How It Works</span>
           <h2
             ref={headingRef}
-            className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide text-white leading-tight"
+            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-white leading-tight"
           >
             From First Call to<br />Qualified Leads
           </h2>
@@ -125,11 +125,11 @@ export default function ProcessSection() {
         </div>
 
         {/* Timeline + Cards */}
-        <div className="process-steps relative pl-16">
+        <div className="process-steps relative pl-12 sm:pl-14 md:pl-16">
           {/* Vertical line */}
           <div
             ref={lineRef}
-            className="absolute left-4 top-4 bottom-4 w-px"
+            className="absolute left-3 sm:left-4 top-4 bottom-4 w-px"
             style={{
               background: "linear-gradient(180deg, #5c939f 0%, rgba(92,147,159,0.08) 100%)",
               transform: "scaleY(0)",
@@ -146,9 +146,9 @@ export default function ProcessSection() {
               >
                 {/* Step dot on timeline */}
                 <div
-                  className="absolute flex items-center justify-center w-8 h-8 rounded-full"
+                  className="absolute flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full"
                   style={{
-                    left: "-4rem",
+                    left: "clamp(-3.5rem, -8vw, -4rem)",
                     top: "50%",
                     transform: "translateY(-50%)",
                     background: "rgba(18,18,20,0.8)",
@@ -164,7 +164,7 @@ export default function ProcessSection() {
 
                 {/* Card */}
                 <div
-                  className="rounded-2xl p-7 hover-card-dark"
+                  className="rounded-2xl p-5 sm:p-6 lg:p-7 hover-card-dark"
                   style={{
                     background: step.color,
                     backdropFilter: "blur(24px) saturate(160%)",

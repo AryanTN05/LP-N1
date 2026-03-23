@@ -58,7 +58,7 @@ body {
 .section-label {
   font-family: 'Space Mono', monospace;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
   text-transform: uppercase;
   letter-spacing: 0.22em;
   color: rgba(255,255,255,0.7);
@@ -188,7 +188,7 @@ body {
 .ethos-cards-row {
   display: flex;
   gap: 0.5rem;
-  min-height: 450px;
+  min-height: clamp(300px, 55vh, 450px);
 }
 
 .ethos-card {
@@ -223,7 +223,7 @@ body {
 
 .ethos-card h3 {
   font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   line-height: 1.2;
@@ -240,7 +240,7 @@ body {
 .ethos-card-teal { background: rgba(95, 143, 138, 0.88); }
 .ethos-card-teal, .ethos-card-teal h3, .ethos-card-teal p, .ethos-card-teal span { color: #0a0a0a !important; }
 
-.ethos-card-orange { background: rgba(212, 120, 92, 0.88); }
+.ethos-card-orange { background: rgba(237, 109, 64, 0.88); }
 .ethos-card-orange, .ethos-card-orange h3, .ethos-card-orange p, .ethos-card-orange span { color: #0a0a0a !important; }
 
 .ethos-card-light { background: rgba(30, 45, 53, 0.92); }
@@ -482,7 +482,7 @@ body {
 
 .dot-burst {
   position: absolute;
-  width: 500px; height: 500px;
+  width: clamp(200px, 50vw, 500px); height: clamp(200px, 50vw, 500px);
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   background-image: radial-gradient(circle, rgba(94,234,212,0.12) 1px, transparent 1px);
@@ -514,12 +514,23 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 
 /* ═══════════════ RESPONSIVE ETHOS CARDS ═══════════════ */
+@media (max-width: 1024px) {
+  .ethos-cards-row {
+    flex-wrap: wrap;
+    min-height: unset;
+  }
+  .ethos-card {
+    flex: 1 1 45%;
+    min-height: 280px;
+  }
+}
 @media (max-width: 768px) {
   .ethos-cards-row {
     flex-direction: column;
   }
   .ethos-card {
-    min-height: 300px;
+    flex: 1 1 100%;
+    min-height: 220px;
   }
   .ethos-card:hover {
     flex: 1;
@@ -708,22 +719,34 @@ html.lenis, html.lenis body { height: auto; }
 }
 .work-slide {
   flex-shrink: 0;
-  width: 28%;
+  width: 20%;
   border-radius: 20px;
   overflow: hidden;
   transition: width 0.6s var(--easing), box-shadow 0.4s var(--easing);
   cursor: pointer;
 }
 .work-slide.active {
-  width: 44%;
+  width: 34%;
+}
+@media (min-width: 1920px) {
+  .work-slide { width: 18%; }
+  .work-slide.active { width: 30%; }
+}
+@media (max-width: 1440px) {
+  .work-slide { width: 24%; }
+  .work-slide.active { width: 40%; }
 }
 @media (max-width: 1024px) {
-  .work-slide { width: 42%; }
-  .work-slide.active { width: 70%; }
+  .work-slide { width: 36%; }
+  .work-slide.active { width: 58%; }
+}
+@media (max-width: 768px) {
+  .work-slide { width: 50%; }
+  .work-slide.active { width: 72%; }
 }
 @media (max-width: 640px) {
-  .work-slide { width: 80%; }
-  .work-slide.active { width: 80%; }
+  .work-slide { width: 78%; }
+  .work-slide.active { width: 85%; }
 }
 
 /* ═══════════════ SELECTION ═══════════════ */
@@ -825,8 +848,30 @@ html.lenis, html.lenis body { height: auto; }
   bottom: 0;
   left: 0;
   right: 0;
-  height: 180px;
+  height: clamp(100px, 20vh, 180px);
   background: linear-gradient(to bottom, transparent, #000);
   pointer-events: none;
   z-index: 2;
+}
+
+/* ═══════════════ GLOBAL RESPONSIVE ═══════════════ */
+@media (max-width: 640px) {
+  .btn-bracket {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.68rem;
+  }
+  .btn-bracket:hover {
+    padding-left: 2.2rem;
+  }
+}
+
+/* Disable hover lift on touch devices */
+@media (hover: none) {
+  .hover-card-dark:hover,
+  .hover-card-light:hover,
+  .glass-card:hover,
+  .light-card:hover,
+  .ethos-card:hover {
+    transform: none !important;
+  }
 }

@@ -22,7 +22,7 @@ const focusItems = [
   {
     label: "Performance-Based Setup",
     desc: "One-time setup fee, then you only pay for qualified leads delivered. No monthly retainers, no hidden costs.",
-    color: "rgba(212,120,92,0.88)",
+    color: "rgba(237,109,64,0.88)",
     textColor: "#0a0a0a",
     numColor: "rgba(0,0,0,0.4)",
   },
@@ -93,7 +93,7 @@ export default function SolutionSection() {
           <span className="solution-label section-label-dark mb-4 block">The Solution</span>
           <h2
             ref={headingRef}
-            className="font-heading text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wide leading-tight text-zinc-900"
+            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide leading-tight text-zinc-900"
           >
             Qualified Leads Delivered<br />to Your Inbox
           </h2>
@@ -108,7 +108,7 @@ export default function SolutionSection() {
             <div
               key={i}
               ref={(el) => (cardRefs.current[i] = el)}
-              className="rounded-2xl p-7 hover-card-light"
+              className="rounded-2xl p-5 sm:p-6 lg:p-7 hover-card-light"
               style={{
                 background: item.color,
                 backdropFilter: "blur(24px) saturate(160%)",

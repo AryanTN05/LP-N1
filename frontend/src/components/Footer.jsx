@@ -47,7 +47,7 @@ export default function Footer() {
       {/* Main section: globe left, orange card right */}
       <div
         className="grid grid-cols-1 lg:grid-cols-2 items-stretch"
-        style={{ background: "var(--rich-carbon)", minHeight: 520 }}
+        style={{ background: "var(--rich-carbon)", minHeight: "clamp(400px, 65vh, 520px)" }}
       >
         {/* Left — globe canvas */}
         <div className="hidden lg:block relative">
@@ -55,16 +55,16 @@ export default function Footer() {
         </div>
 
         {/* Right — orange card floating inside dark bg */}
-        <div className="flex items-center justify-center p-8 lg:p-10">
+        <div className="flex items-center justify-center p-6 sm:p-8 lg:p-10">
           <div
-            className="w-full rounded-[24px] flex flex-col justify-between px-10 py-12"
+            className="w-full rounded-[24px] flex flex-col justify-between px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12"
             style={{
               background: "rgba(237, 109, 64, 0.88)",
               backdropFilter: "blur(28px) saturate(160%)",
               WebkitBackdropFilter: "blur(28px) saturate(160%)",
               border: "1px solid rgba(255,255,255,0.15)",
               boxShadow: "0 16px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
-              minHeight: 400,
+              minHeight: "clamp(300px, 55vh, 400px)",
             }}
           >
             <div>
