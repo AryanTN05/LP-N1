@@ -69,7 +69,10 @@ export default function Navbar() {
   useEffect(() => {
     if (!pillRef.current || !navRef.current) return;
 
-    if (inLight) {
+    const isDesktop = window.innerWidth >= 768;
+
+    if (inLight && isDesktop) {
+      // Desktop: hide nav, show pill
       gsap.to(navRef.current, {
         opacity: 0, y: -8,
         duration: 0.45, ease: "power3.inOut",
@@ -81,7 +84,21 @@ export default function Navbar() {
         { opacity: 0, y: -16, scale: 0.96 },
         { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out", delay: 0.12 }
       );
+    } else if (inLight && !isDesktop) {
+      // Mobile: keep nav visible with full glassmorphism
+      navRef.current.style.pointerEvents = "auto";
+      gsap.to(navRef.current, {
+        opacity: 1, y: 0,
+        duration: 0.3, ease: "power3.out",
+      });
+      // Force glass background on mobile when scrolled
+      navRef.current.style.background = "rgba(12,12,14,0.52)";
+      navRef.current.style.backdropFilter = "blur(28px) saturate(180%)";
+      navRef.current.style.webkitBackdropFilter = "blur(28px) saturate(180%)";
+      navRef.current.style.borderBottomColor = "rgba(255,255,255,0.08)";
+      navRef.current.style.boxShadow = "0 4px 24px rgba(0,0,0,0.3)";
     } else {
+      // Not in light section: show nav, hide pill
       gsap.to(pillRef.current, {
         opacity: 0, y: -10, scale: 0.96,
         duration: 0.3, ease: "power2.in",
