@@ -1,0 +1,150 @@
+{
+  "identity": {
+    "brand_name": "Aryan TN",
+    "role": "AI Automation Specialist",
+    "mission": "Building autonomous lead generation systems for B2B founders.",
+    "emotional_tone": "Technical, Precise, Authority, High-Efficiency",
+    "visual_mood": "Dark Minimal, Grid-Based, High Contrast, No Fluff"
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Outfit, sans-serif",
+      "weight": "600",
+      "style": "Modern Geometric",
+      "usage": "H1, H2, H3 - Tight tracking (-0.02em)"
+    },
+    "body": {
+      "font_family": "Inter, sans-serif",
+      "weight": "400",
+      "style": "Clean & Legible",
+      "usage": "Paragraphs, Lists, UI Text"
+    },
+    "mono": {
+      "font_family": "JetBrains Mono, monospace",
+      "usage": "Code snippets, numbers, technical labels"
+    }
+  },
+  "colors": {
+    "background": "#09090b", 
+    "surface": "#18181b",
+    "surface_highlight": "#27272a",
+    "border": "#27272a",
+    "text": {
+      "primary": "#fafafa",
+      "secondary": "#a1a1aa",
+      "muted": "#52525b"
+    },
+    "accent": {
+      "primary": "#ffffff",
+      "secondary": "#22c55e",
+      "glow": "rgba(255, 255, 255, 0.1)"
+    }
+  },
+  "layout_strategy": {
+    "container_width": "max-w-7xl",
+    "spacing": {
+      "section_gap": "py-24",
+      "element_gap": "gap-8"
+    },
+    "grid_system": "Bento Grid (Use CSS Grid with col-span adjustments)",
+    "mobile_first": "Single column on mobile, 3-4 columns on desktop"
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-white text-black hover:bg-gray-200 rounded-full px-8 py-6 font-medium transition-all",
+      "secondary": "bg-transparent border border-zinc-800 text-zinc-300 hover:border-zinc-600 rounded-full px-8 py-6 transition-all"
+    },
+    "cards": {
+      "style": "bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all rounded-xl p-8 backdrop-blur-sm",
+      "effect": "Subtle inner glow or spotlight effect on hover"
+    },
+    "inputs": {
+      "style": "bg-zinc-950 border-zinc-800 focus:border-white/20 focus:ring-0 rounded-lg h-12"
+    }
+  },
+  "visual_enhancers": {
+    "background_texture": "Radial gradient at top center: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 50%)",
+    "grid_lines": "Fixed background grid pattern: linear-gradient(to right, #27272a 1px, transparent 1px), linear-gradient(to bottom, #27272a 1px, transparent 1px); background-size: 4rem 4rem; mask-image: radial-gradient(circle at center, black, transparent 80%)",
+    "animations": "Fade-in up for sections, marquee for logos, subtle pulse for 'live' status"
+  },
+  "sections": {
+    "hero": {
+      "layout": "Centered",
+      "elements": [
+        "Badge: 'Accepting New Clients' (Green dot indicator)",
+        "H1: 'Automate your entire B2B Lead Gen system'",
+        "Subtext: 'Stop manual prospecting. I build autonomous AI agents that book meetings while you sleep.'",
+        "CTA: 'Book a 30-min Audit'",
+        "Social Proof: 'Trusted by founders from'"
+      ]
+    },
+    "logos": {
+      "type": "Marquee",
+      "style": "Grayscale, 50% opacity, hover to 100%"
+    },
+    "pain_points": {
+      "title": "Is this you?",
+      "style": "3-column grid of simple text cards. Highlight keywords in white."
+    },
+    "process": {
+      "style": "Vertical timeline or numbered step cards connected by a subtle line."
+    },
+    "faq": {
+      "component": "Shadcn Accordion",
+      "style": "Minimal border-bottom only"
+    }
+  },
+  "assets": {
+    "logos": [
+      {
+        "name": "Claude",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png",
+        "fallback_text": "Claude (Anthropic)"
+      },
+      {
+        "name": "n8n",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/N8n-logo.png",
+        "fallback_text": "n8n"
+      },
+      {
+        "name": "Slack",
+        "url": "https://cdn.simpleicons.org/slack/white",
+        "fallback_text": "Slack"
+      },
+      {
+        "name": "Apollo.io",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Apollo_global_management_logo.svg",
+        "fallback_text": "Apollo.io"
+      },
+      {
+        "name": "Clay",
+        "url": "https://assets-global.website-files.com/61549d5c5898516d7647249d/61549d5c589851726a4724d2_Clay_Logo_White.svg",
+        "fallback_text": "Clay"
+      }
+    ],
+    "images": [
+      {
+        "category": "abstract_bg",
+        "url": "https://images.unsplash.com/photo-1772050138768-2107c6e62a03?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzl8MHwxfHNlYXJjaHwyfHx0ZWNobm9sb2d5JTIwbmV0d29yayUyMGFic3RyYWN0JTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzczNzQ2Mzg5fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract green light trails for hero background (use with overlay)"
+      },
+      {
+        "category": "abstract_network",
+        "url": "https://images.unsplash.com/photo-1737505599162-d9932323a889?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzl8MHwxfHNlYXJjaHwxfHx0ZWNobm9sb2d5JTIwbmV0d29yayUyMGFic3RyYWN0JTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzczNzQ2Mzg5fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Blue/Green network balls for 'How it works' section"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "1. IMPLEMENTATION: Use React + Tailwind + Shadcn.",
+    "2. THEME: Force dark mode. Do not implement a light mode toggle. The brand is strictly dark.",
+    "3. FONTS: Import 'Outfit' and 'Inter' from Google Fonts in index.css.",
+    "4. LOGOS: If a logo URL fails, render the text name in 'Outfit' font with a subtle border box.",
+    "5. GRID: Use 'bento-grid' style for the Services/Results section. Vary col-spans (1 vs 2).",
+    "6. CTA: The main CTA is 'Book a Call' -> link to 'https://cal.com/aryantn01/30min'.",
+    "7. FOOTER: Include links to LinkedIn ('https://www.linkedin.com/in/aryan-tn/') and Email ('aryantn01@gmail.com').",
+    "8. ACCESSIBILITY: Ensure text contrast is high (gray-200/gray-400) against the black background.",
+    "9. NO PURPLE: Do not use purple gradients. Stick to Monochrome/Zinc/White with Green/Blue accents only for success indicators.",
+    "10. TESTING: Add data-testid to all interactive elements."
+  ]
+}

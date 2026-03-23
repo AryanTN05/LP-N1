@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.worldquantfoundry.com)",
+      "Bash(curl -s https://www.worldquantfoundry.com/)",
+      "Bash(curl -s https://www.worldquantfoundry.com/assets/main.min.css)",
+      "Bash(yarn add:*)",
+      "Bash(npm install:*)",
+      "Bash(/usr/local/bin/npm install:*)",
+      "Read(//Users/aryantn/.nvm/versions/node/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/**)",
+      "Bash(/Users/aryantn/.nvm/versions/node/v24.14.0/bin/npm install:*)"
+    ]
+  }
+}
