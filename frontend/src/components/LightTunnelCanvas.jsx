@@ -127,7 +127,7 @@ export default function LightTunnelCanvas() {
         const size = d.baseSize * (0.6 + depthFade * 0.6);
 
         // Alpha: stronger in front, fades toward back
-        const alpha = d.baseAlpha * depthFade * depthFade;
+        const alpha = d.baseAlpha * depthFade * depthFade * 0.5;
 
         if (alpha < 0.01) continue;
 

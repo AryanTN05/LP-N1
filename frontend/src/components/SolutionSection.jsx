@@ -97,7 +97,7 @@ export default function SolutionSection() {
           >
             Qualified Leads Delivered<br />to Your Inbox
           </h2>
-          <p className="solution-desc text-sm mt-6 max-w-2xl mx-auto leading-relaxed text-zinc-600">
+          <p className="solution-desc text-sm mt-6 max-w-2xl mx-auto leading-relaxed text-zinc-700 font-medium">
             We build and run the entire AI lead generation machine — You focus on what you do best.
           </p>
         </div>

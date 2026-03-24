@@ -86,7 +86,7 @@ export default function ResultsSection() {
             className="mt-8 h-px bg-gradient-to-r from-[#5c939f]/60 to-transparent"
             style={{ transform: "scaleX(0)", transformOrigin: "left center" }}
           />
-          <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-600 leading-relaxed max-w-md mt-6">
+          <p className="font-mono text-[12px] uppercase tracking-[0.15em] text-zinc-700 leading-relaxed max-w-md mt-6 font-bold">
             No vanity metrics. No excuses. Just a predictable flow of
             qualified conversations with people who need what you sell.
           </p>

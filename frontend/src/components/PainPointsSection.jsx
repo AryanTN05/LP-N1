@@ -81,7 +81,7 @@ export default function PainPointsSection() {
           </div>
           <div className="flex flex-col justify-end">
             <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-400 to-transparent mb-6" />
-            <p className="text-base leading-relaxed text-zinc-600 max-w-lg">
+            <p className="text-base leading-relaxed text-zinc-700 font-medium max-w-lg">
               Most B2B founders are stuck in one of these cycles. Manual prospecting, ignored outreach,
               failed agencies. Sound familiar?
             </p>

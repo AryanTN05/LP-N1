@@ -68,10 +68,10 @@ const LandingPage = () => {
         </div>
 
         {/* LIGHT sections — wrapped for clip-path wipe */}
-        <div id="light-wipe" style={{ willChange: "clip-path" }}>
+        <div id="light-wipe" style={{ willChange: "clip-path", borderRadius: "clamp(16px, 3vw, 32px) clamp(16px, 3vw, 32px) 0 0" }}>
           <LightTunnelCanvas />
-          
-          <div className="section-light relative">
+
+          <div className="section-light relative" style={{ marginTop: "-100vh" }}>
             <PainPointsSection />
           </div>
 
@@ -89,18 +89,10 @@ const LandingPage = () => {
             <WhyMeSection />
           </div>
 
-          {/* DARK: Process */}
-          <div className="section-dark">
+          {/* DARK: Process + FAQ + Footer — single block with rounded top corners */}
+          <div className="section-dark" style={{ borderRadius: "clamp(24px, 4vw, 48px) clamp(24px, 4vw, 48px) 0 0", overflow: "hidden", position: "relative", zIndex: 2 }}>
             <ProcessSection />
-          </div>
-
-          {/* DARK: FAQ */}
-          <div className="section-dark">
             <FaqSection />
-          </div>
-
-          {/* Footer */}
-          <div className="section-dark">
             <Footer />
           </div>
         </div>
