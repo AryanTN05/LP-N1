@@ -19,61 +19,57 @@ export default function Navbar() {
   const navRef = useRef(null);
   const pillRef = useRef(null);
 
-  // ── Smooth continuous scroll interpolation ────────────────
+  // ── Scroll-driven glassmorphism (only updates on scroll) ────
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
 
-    let scrollY = 0;
-    let current = 0; // lerped value
+    let lastScrollY = -1;
+    let current = 0;
     let rafId;
-    const FADE_RANGE = 220; // px over which glass fades in
+    const FADE_RANGE = 220;
     const HERO_THRESHOLD = window.innerHeight * 0.85;
 
     const tick = () => {
-      // Lerp toward target scroll value
-      current += (scrollY - current) * 0.1;
-      const p = Math.min(current / FADE_RANGE, 1); // 0 → 1
+      rafId = requestAnimationFrame(tick);
 
-      // Only interpolate main nav if we aren't heavily past the threshold
-      if (!inLight) {
-        // Interpolate styles directly
-        nav.style.background = `rgba(12,12,14,${(p * 0.52).toFixed(3)})`;
-        nav.style.backdropFilter = `blur(${(p * 28).toFixed(1)}px) saturate(${(100 + p * 80).toFixed(0)}%)`;
+      const scrollY = window.scrollY;
+      // Skip if scroll hasn't changed (avoid unnecessary DOM writes)
+      if (scrollY === lastScrollY) return;
+      lastScrollY = scrollY;
+
+      current += (scrollY - current) * 0.1;
+      const p = Math.min(current / FADE_RANGE, 1);
+
+      const nowInLight = scrollY > HERO_THRESHOLD;
+      if (nowInLight !== inLight) setInLight(nowInLight);
+
+      if (!nowInLight) {
+        nav.style.background = `rgba(12,12,14,${(p * 0.52).toFixed(2)})`;
+        nav.style.backdropFilter = `blur(${(p * 28) | 0}px) saturate(${(100 + p * 80) | 0}%)`;
         nav.style.webkitBackdropFilter = nav.style.backdropFilter;
-        nav.style.borderBottomColor = `rgba(255,255,255,${(p * 0.08).toFixed(3)})`;
+        nav.style.borderBottomColor = `rgba(255,255,255,${(p * 0.08).toFixed(2)})`;
         nav.style.boxShadow = p > 0.05
-          ? `0 4px ${(p * 24).toFixed(0)}px rgba(0,0,0,${(p * 0.3).toFixed(2)})`
+          ? `0 4px ${(p * 24) | 0}px rgba(0,0,0,${(p * 0.3).toFixed(1)})`
           : "none";
-        // Shrink padding as user scrolls
-        const py = (1.25 - p * 0.5).toFixed(3);
+        const py = (1.25 - p * 0.5).toFixed(2);
         nav.style.paddingTop = `${py}rem`;
         nav.style.paddingBottom = `${py}rem`;
       }
-
-      rafId = requestAnimationFrame(tick);
-    };
-
-    const onScroll = () => {
-      scrollY = window.scrollY;
-      setInLight(window.scrollY > HERO_THRESHOLD);
     };
 
     rafId = requestAnimationFrame(tick);
-    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", onScroll);
     };
   }, [inLight]);
 
-  // ── Pill in / full-nav out when entering light section ────
+  // ── Pill in / full-nav out when entering light section ──────
   useEffect(() => {
     if (!pillRef.current || !navRef.current) return;
 
     if (inLight) {
-      // Hide full nav, show pill for BOTH desktop and mobile
       gsap.to(navRef.current, {
         opacity: 0, y: -8,
         duration: 0.45, ease: "power3.inOut",
@@ -86,7 +82,6 @@ export default function Navbar() {
         { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out", delay: 0.12 }
       );
     } else {
-      // Not in light section: show nav, hide pill
       gsap.to(pillRef.current, {
         opacity: 0, y: -10, scale: 0.96,
         duration: 0.3, ease: "power2.in",
@@ -100,7 +95,7 @@ export default function Navbar() {
     }
   }, [inLight]);
 
-  // ── Mobile menu ───────────────────────────────────────────
+  // ── Mobile menu ─────────────────────────────────────────────
   useEffect(() => {
     if (!menuRef.current) return;
     const links = menuLinksRef.current.filter(Boolean);
@@ -142,7 +137,6 @@ export default function Navbar() {
         style={{ paddingTop: "1.25rem", paddingBottom: "1.25rem" }}
       >
         <div className="px-6 md:px-12 flex items-center justify-between">
-          {/* Logo */}
           <a
             href="#"
             className="font-heading text-xl tracking-widest uppercase text-white hover:opacity-70 transition-opacity"
@@ -150,7 +144,6 @@ export default function Navbar() {
             Aryan <span className="font-sans font-light text-zinc-400">TN</span>
           </a>
 
-          {/* Right-aligned links + CTA — desktop */}
           <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
               <a key={link.label} href={link.href} className="nav-link">
@@ -169,7 +162,6 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Hamburger — mobile */}
           <button
             className="md:hidden text-white p-2 relative z-50"
             onClick={() => setMenuOpen(true)}
@@ -196,7 +188,6 @@ export default function Navbar() {
           boxShadow: "0 4px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
       >
-        {/* Left Side: Logo */}
         <a
           href="#"
           className="font-heading text-sm md:text-sm tracking-widest uppercase text-white hover:opacity-70 transition-opacity"
@@ -204,7 +195,6 @@ export default function Navbar() {
           ATN
         </a>
 
-        {/* Center: Desktop Links Container */}
         <div className="hidden md:flex items-center gap-6 mx-4">
           <div className="w-px h-4 bg-white/10" />
           {navLinks.map((link) => (
@@ -219,7 +209,6 @@ export default function Navbar() {
           <div className="w-px h-4 bg-white/10" />
         </div>
 
-        {/* Right Side: Desktop CTA */}
         <a
           href={CAL_LINK}
           target="_blank"
@@ -230,7 +219,6 @@ export default function Navbar() {
           Book a Call
         </a>
 
-        {/* Right Side: Mobile Hamburger in Pill */}
         <button
           className="md:hidden text-white p-1"
           onClick={() => setMenuOpen(true)}

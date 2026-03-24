@@ -16,27 +16,25 @@ export default function ParticleCanvas() {
     const camera = new THREE.PerspectiveCamera(50, w / h, 1, 4000);
     camera.position.z = 1200;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(w, h);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
-    // ── Group (like footer) ──────────────────────────────────────────
     const group = new THREE.Group();
     group.position.set(0, 0, -300);
     scene.add(group);
 
-    // ── Generate sphere points (Fibonacci, like footer) ──────────────
+    // ── Sphere points ──────────────────────────────────────────
     const RADIUS = 500;
-    const COUNT = 1200;
+    const COUNT = 800; // Reduced from 1200
     const MAX_CONN_DIST = 90;
 
     const positions = new Float32Array(COUNT * 3);
     const colors = new Float32Array(COUNT * 3);
     const pointVecs = [];
 
-    // Random distribution (unstructured network, not Fibonacci grid)
     for (let i = 0; i < COUNT; i++) {
       const u = Math.random();
       const v = Math.random();
@@ -50,17 +48,14 @@ export default function ParticleCanvas() {
       positions[i * 3] = x;
       positions[i * 3 + 1] = y;
       positions[i * 3 + 2] = z;
-
       pointVecs.push(new THREE.Vector3(x, y, z));
 
-      // Teal color palette
       const b = 0.5 + Math.random() * 0.5;
       colors[i * 3] = 0.36 * b;
       colors[i * 3 + 1] = 0.57 * b;
       colors[i * 3 + 2] = 0.62 * b;
     }
 
-    // ── Dots (PointsMaterial, like footer) ────────────────────────────
     const dotGeo = new THREE.BufferGeometry();
     dotGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     dotGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
@@ -78,7 +73,7 @@ export default function ParticleCanvas() {
     const dots = new THREE.Points(dotGeo, dotMat);
     group.add(dots);
 
-    // ── Connection lines (LineBasicMaterial, like footer wireframe) ───
+    // ── Connection lines (pre-computed once) ────────────────────
     const linePositions = [];
     for (let i = 0; i < COUNT; i++) {
       let connections = 0;
@@ -97,7 +92,6 @@ export default function ParticleCanvas() {
 
     const lineGeo = new THREE.BufferGeometry();
     lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
-
     const lineMat = new THREE.LineBasicMaterial({
       color: 0x5c939f,
       transparent: true,
@@ -105,12 +99,11 @@ export default function ParticleCanvas() {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
-
     const lines = new THREE.LineSegments(lineGeo, lineMat);
     group.add(lines);
 
-    // ── Wake particles (like footer) ─────────────────────────────────
-    const wakeCount = 600;
+    // ── Wake particles ─────────────────────────────────────────
+    const wakeCount = 350; // Reduced from 600
     const wakePos = new Float32Array(wakeCount * 3);
     for (let i = 0; i < wakeCount; i++) {
       const t = i / wakeCount;
@@ -135,20 +128,19 @@ export default function ParticleCanvas() {
     const wake = new THREE.Points(wakeGeo, wakeMat);
     group.add(wake);
 
-    // ── Hover glow — screen-space proximity ─────────────────────────
-    const mouseScreen = new THREE.Vector2(9999, 9999);
-    const GLOW_SCREEN_RADIUS = 0.15; // NDC units (~15% of screen)
-    const GLOW_SCREEN_RADIUS_SQ = GLOW_SCREEN_RADIUS * GLOW_SCREEN_RADIUS;
-    const origColors = new Float32Array(colors);
-    const tempVec = new THREE.Vector3();
+    // ── Single mouse handler (merged hover + parallax) ─────────
+    let mouseX = 0, mouseY = 0;
+    let mouseNdcX = 9999, mouseNdcY = 9999;
 
-    const handleHoverMove = (e) => {
-      mouseScreen.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseScreen.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    const handleMouse = (e) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      mouseNdcX = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseNdcY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
-    window.addEventListener("mousemove", handleHoverMove);
+    window.addEventListener("mousemove", handleMouse, { passive: true });
 
-    // ── Scroll-driven scatter animation ──────────────────────────────
+    // ── Scroll-driven scatter ──────────────────────────────────
     const scrollData = { progress: 0 };
     const heroSection = container.closest("section");
 
@@ -165,111 +157,111 @@ export default function ParticleCanvas() {
       });
     }
 
-    // ── Mouse tracking (identical to footer) ─────────────────────────
-    let mouseX = 0, mouseY = 0;
-    const handleMouse = (e) => {
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-    };
-    window.addEventListener("mousemove", handleMouse);
+    // ── Hover glow — sample every 3rd particle ─────────────────
+    const origColors = new Float32Array(colors);
+    const GLOW_RADIUS = 0.15;
+    const GLOW_RADIUS_SQ = GLOW_RADIUS * GLOW_RADIUS;
+    const tempVec = new THREE.Vector3();
 
-    // ── Animation loop (identical structure to footer) ────────────────
+    // ── Animation loop ─────────────────────────────────────────
     let raf;
     let lastFrame = 0;
     const clock = new THREE.Clock();
     let rotX = 0, rotY = 0;
+    let frameCount = 0;
 
     const animate = () => {
       raf = requestAnimationFrame(animate);
       const now = clock.getElapsedTime();
-      // Frame-rate throttle like footer (28ms)
-      if (now - lastFrame < 0.028) return;
+      if (now - lastFrame < 0.028) return; // ~35fps cap
       lastFrame = now;
+      frameCount++;
 
       const p = scrollData.progress;
       const influence = 1 - p;
 
-      // ── Scroll: expand entire globe outward + fade ──
-      const expand = 1 + p * p * 4; // scale 1x → 5x
+      // Skip rendering when fully scrolled away
+      if (p > 0.95) {
+        renderer.clear();
+        return;
+      }
+
+      const expand = 1 + p * p * 4;
       group.scale.set(expand, expand, expand);
 
-      // Fade everything as it expands
       const fade = Math.max(0, 1 - p * p * 1.5);
       dotMat.opacity = 0.85 * fade;
-      dotMat.needsUpdate = true;
       lineMat.opacity = 0.18 * fade;
-      lineMat.needsUpdate = true;
       wakeMat.opacity = 0.15 * fade;
-      wakeMat.needsUpdate = true;
 
-      // ── Rotation + parallax (identical to footer) ──
       const targetRotY = now * 0.03 * influence + mouseX * 0.25 * influence;
       const targetRotX = mouseY * 0.15 * influence;
-
       rotY += (targetRotY - rotY) * 0.04;
       rotX += (targetRotX - rotX) * 0.04;
-
       group.rotation.y = rotY;
       group.rotation.x = rotX;
 
-      // Camera drift (like footer)
       camera.position.x += (mouseX * 60 * influence - camera.position.x) * 0.04;
       camera.position.y += (-mouseY * 50 * influence - camera.position.y) * 0.04;
       camera.lookAt(scene.position);
 
-      // ── Hover glow: project dots to screen, brighten near cursor ──
-      const colArr = dotGeo.attributes.color.array;
-      const posArr = dotGeo.attributes.position.array;
-      let colorChanged = false;
+      // Hover glow — only run every 2nd frame, sample every 4th particle
+      if (frameCount % 2 === 0) {
+        const colArr = dotGeo.attributes.color.array;
+        const posArr = dotGeo.attributes.position.array;
+        let colorChanged = false;
 
-      for (let i = 0; i < COUNT; i++) {
-        const ix = i * 3;
+        for (let i = 0; i < COUNT; i += 4) {
+          const ix = i * 3;
+          tempVec.set(posArr[ix], posArr[ix + 1], posArr[ix + 2]);
+          dots.localToWorld(tempVec);
+          tempVec.project(camera);
 
-        // Project dot's world position to NDC
-        tempVec.set(posArr[ix], posArr[ix + 1], posArr[ix + 2]);
-        dots.localToWorld(tempVec);
-        tempVec.project(camera);
+          const dx = tempVec.x - mouseNdcX;
+          const dy = tempVec.y - mouseNdcY;
+          const distSq = dx * dx + dy * dy;
 
-        const dx = tempVec.x - mouseScreen.x;
-        const dy = tempVec.y - mouseScreen.y;
-        const distSq = dx * dx + dy * dy;
-
-        if (distSq < GLOW_SCREEN_RADIUS_SQ) {
-          const t = 1 - Math.sqrt(distSq) / GLOW_SCREEN_RADIUS;
-          const boost = t * t;
-          colArr[ix] = origColors[ix] + (1.0 - origColors[ix]) * boost;
-          colArr[ix + 1] = origColors[ix + 1] + (1.0 - origColors[ix + 1]) * boost;
-          colArr[ix + 2] = origColors[ix + 2] + (1.0 - origColors[ix + 2]) * boost;
-          colorChanged = true;
-        } else if (colArr[ix] !== origColors[ix]) {
-          colArr[ix] = origColors[ix];
-          colArr[ix + 1] = origColors[ix + 1];
-          colArr[ix + 2] = origColors[ix + 2];
-          colorChanged = true;
+          if (distSq < GLOW_RADIUS_SQ) {
+            const t = 1 - Math.sqrt(distSq) / GLOW_RADIUS;
+            const boost = t * t;
+            colArr[ix] = origColors[ix] + (1.0 - origColors[ix]) * boost;
+            colArr[ix + 1] = origColors[ix + 1] + (1.0 - origColors[ix + 1]) * boost;
+            colArr[ix + 2] = origColors[ix + 2] + (1.0 - origColors[ix + 2]) * boost;
+            colorChanged = true;
+          } else if (colArr[ix] !== origColors[ix]) {
+            colArr[ix] = origColors[ix];
+            colArr[ix + 1] = origColors[ix + 1];
+            colArr[ix + 2] = origColors[ix + 2];
+            colorChanged = true;
+          }
         }
-      }
 
-      if (colorChanged) dotGeo.attributes.color.needsUpdate = true;
+        if (colorChanged) dotGeo.attributes.color.needsUpdate = true;
+      }
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // ── Resize ───────────────────────────────────────────────────────
+    // ── Resize (debounced) ─────────────────────────────────────
+    let resizeTimer;
     const handleResize = () => {
-      const nw = container.clientWidth;
-      const nh = container.clientHeight;
-      camera.aspect = nw / nh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(nw, nh);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const nw = container.clientWidth;
+        const nh = container.clientHeight;
+        camera.aspect = nw / nh;
+        camera.updateProjectionMatrix();
+        renderer.setSize(nw, nh);
+      }, 100);
     };
     window.addEventListener("resize", handleResize);
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(resizeTimer);
       window.removeEventListener("mousemove", handleMouse);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleHoverMove);
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
@@ -284,7 +276,6 @@ export default function ParticleCanvas() {
     <div
       ref={mountRef}
       className="absolute inset-0 z-0 pointer-events-auto"
-      style={{ willChange: "transform" }}
       aria-hidden="true"
     />
   );

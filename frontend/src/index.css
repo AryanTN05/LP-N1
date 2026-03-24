@@ -879,3 +879,14 @@ html.lenis, html.lenis body { height: auto; }
     transform: none !important;
   }
 }
+
+/* Reduce backdrop-filter blur on mobile for performance */
+@media (max-width: 768px) {
+  .glass-card,
+  .ethos-card,
+  .hover-card-dark,
+  .hover-card-light {
+    backdrop-filter: blur(12px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  }
+}

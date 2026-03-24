@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 /**
  * Constellation network background for dark sections (Process + FAQ).
  * Slowly drifting particles with faint teal connection lines.
- * Pure 2D canvas for smooth 60fps.
+ * Pure 2D canvas — optimized with spatial grid for O(n) connection checks.
  */
 export default function DarkFieldCanvas() {
   const canvasRef = useRef(null);
@@ -13,9 +13,10 @@ export default function DarkFieldCanvas() {
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    const dpr = Math.min(window.devicePixelRatio, 2);
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
 
     let W, H;
+    let cachedRect = null;
 
     const resize = () => {
       const parent = canvas.parentElement;
@@ -24,12 +25,14 @@ export default function DarkFieldCanvas() {
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cachedRect = null; // Invalidate cached rect
     };
     resize();
 
-    // ── Particles ──────────────────────────────────────────────────
-    const COUNT = Math.min(120, Math.round((W * H) / 12000));
+    // ── Particles ──────────────────────────────────────────────
+    const COUNT = Math.min(90, Math.round((W * H) / 16000)); // Reduced from 120
     const CONNECTION_DIST = 160;
+    const CONNECTION_DIST_SQ = CONNECTION_DIST * CONNECTION_DIST;
     const particles = [];
 
     for (let i = 0; i < COUNT; i++) {
@@ -42,29 +45,52 @@ export default function DarkFieldCanvas() {
         vy: Math.sin(angle) * speed,
         radius: 1.2 + Math.random() * 1.2,
         alpha: 0.3 + Math.random() * 0.4,
-        // For subtle breathing
         phase: Math.random() * Math.PI * 2,
       });
     }
 
-    // ── Mouse ──────────────────────────────────────────────────────
-    let mouseX = -9999;
-    let mouseY = -9999;
+    // ── Spatial grid for O(n) neighbor lookups ─────────────────
+    const CELL_SIZE = CONNECTION_DIST;
+    let gridCols, gridRows, grid;
+
+    const buildGrid = () => {
+      gridCols = Math.ceil(W / CELL_SIZE) + 1;
+      gridRows = Math.ceil(H / CELL_SIZE) + 1;
+      grid = new Array(gridCols * gridRows);
+    };
+    buildGrid();
+
+    const clearGrid = () => {
+      for (let i = 0; i < grid.length; i++) grid[i] = null;
+    };
+
+    const insertGrid = (idx, x, y) => {
+      const col = (x / CELL_SIZE) | 0;
+      const row = (y / CELL_SIZE) | 0;
+      if (col < 0 || col >= gridCols || row < 0 || row >= gridRows) return;
+      const key = row * gridCols + col;
+      // Simple linked-list style: store as [idx, next]
+      grid[key] = { idx, next: grid[key] };
+    };
+
+    // ── Mouse (cached rect) ────────────────────────────────────
+    let mouseX = -9999, mouseY = -9999;
     const MOUSE_RADIUS = 200;
+    const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS;
 
     const handleMouse = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
+      if (!cachedRect) cachedRect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - cachedRect.left;
+      mouseY = e.clientY - cachedRect.top;
     };
-    const handleLeave = () => {
-      mouseX = -9999;
-      mouseY = -9999;
-    };
+    const handleLeave = () => { mouseX = -9999; mouseY = -9999; };
+    const handleScroll = () => { cachedRect = null; }; // Invalidate on scroll
+
     window.addEventListener("mousemove", handleMouse, { passive: true });
     window.addEventListener("mouseleave", handleLeave);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
-    // ── Animation ──────────────────────────────────────────────────
+    // ── Animation ──────────────────────────────────────────────
     let raf;
 
     const draw = (timestamp) => {
@@ -73,49 +99,67 @@ export default function DarkFieldCanvas() {
 
       ctx.clearRect(0, 0, W, H);
 
-      // Update positions
+      // Update positions & build spatial grid
+      clearGrid();
       for (let i = 0; i < COUNT; i++) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
 
-        // Wrap around edges with padding
         if (p.x < -20) p.x = W + 20;
         if (p.x > W + 20) p.x = -20;
         if (p.y < -20) p.y = H + 20;
         if (p.y > H + 20) p.y = -20;
+
+        insertGrid(i, p.x, p.y);
       }
 
-      // Draw connections first (behind dots)
+      // Draw connections using spatial grid (O(n) instead of O(n²))
+      ctx.lineWidth = 0.6;
       for (let i = 0; i < COUNT; i++) {
         const a = particles[i];
-        for (let j = i + 1; j < COUNT; j++) {
-          const b = particles[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const distSq = dx * dx + dy * dy;
+        const col = (a.x / CELL_SIZE) | 0;
+        const row = (a.y / CELL_SIZE) | 0;
 
-          if (distSq < CONNECTION_DIST * CONNECTION_DIST) {
-            const dist = Math.sqrt(distSq);
-            const lineAlpha = (1 - dist / CONNECTION_DIST) * 0.25;
+        // Check 3x3 neighborhood
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const nr = row + dr;
+            const nc = col + dc;
+            if (nr < 0 || nr >= gridRows || nc < 0 || nc >= gridCols) continue;
 
-            // Brighter lines near mouse
-            let mouseBrightness = 0;
-            const midX = (a.x + b.x) * 0.5;
-            const midY = (a.y + b.y) * 0.5;
-            const mDx = midX - mouseX;
-            const mDy = midY - mouseY;
-            const mDist = Math.sqrt(mDx * mDx + mDy * mDy);
-            if (mDist < MOUSE_RADIUS) {
-              mouseBrightness = (1 - mDist / MOUSE_RADIUS) * 0.15;
+            let node = grid[nr * gridCols + nc];
+            while (node) {
+              const j = node.idx;
+              if (j > i) {
+                const b = particles[j];
+                const dx = a.x - b.x;
+                const dy = a.y - b.y;
+                const distSq = dx * dx + dy * dy;
+
+                if (distSq < CONNECTION_DIST_SQ) {
+                  const dist = Math.sqrt(distSq);
+                  let lineAlpha = (1 - dist / CONNECTION_DIST) * 0.25;
+
+                  // Mouse brightness (skip sqrt with squared comparison)
+                  const midX = (a.x + b.x) * 0.5;
+                  const midY = (a.y + b.y) * 0.5;
+                  const mDx = midX - mouseX;
+                  const mDy = midY - mouseY;
+                  const mDistSq = mDx * mDx + mDy * mDy;
+                  if (mDistSq < MOUSE_RADIUS_SQ) {
+                    lineAlpha += (1 - Math.sqrt(mDistSq) / MOUSE_RADIUS) * 0.15;
+                  }
+
+                  ctx.beginPath();
+                  ctx.moveTo(a.x, a.y);
+                  ctx.lineTo(b.x, b.y);
+                  ctx.strokeStyle = `rgba(92,147,159,${lineAlpha.toFixed(3)})`;
+                  ctx.stroke();
+                }
+              }
+              node = node.next;
             }
-
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(92,147,159,${(lineAlpha + mouseBrightness).toFixed(4)})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
           }
         }
       }
@@ -123,30 +167,25 @@ export default function DarkFieldCanvas() {
       // Draw dots
       for (let i = 0; i < COUNT; i++) {
         const p = particles[i];
-
-        // Subtle breathing
         const breathe = Math.sin(t * 0.8 + p.phase) * 0.1;
         const alpha = p.alpha + breathe;
 
-        // Glow near mouse
         let glow = 0;
         const dx = p.x - mouseX;
         const dy = p.y - mouseY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_RADIUS) {
-          glow = (1 - dist / MOUSE_RADIUS) * 0.5;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < MOUSE_RADIUS_SQ) {
+          glow = (1 - Math.sqrt(distSq) / MOUSE_RADIUS) * 0.5;
         }
 
         const finalAlpha = Math.min(1, alpha * 0.8 + glow);
-
-        // Teal-tinted dots, whiter near mouse
         const r = glow > 0.1 ? Math.round(92 + glow * 163) : 92;
         const g = glow > 0.1 ? Math.round(147 + glow * 108) : 147;
         const b = glow > 0.1 ? Math.round(159 + glow * 96) : 159;
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius + glow * 1.5, 0, 6.2832);
-        ctx.fillStyle = `rgba(${r},${g},${b},${finalAlpha.toFixed(3)})`;
+        ctx.fillStyle = `rgba(${r},${g},${b},${finalAlpha.toFixed(2)})`;
         ctx.fill();
       }
     };
@@ -158,7 +197,7 @@ export default function DarkFieldCanvas() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         resize();
-        // Redistribute particles on resize
+        buildGrid();
         for (let i = 0; i < COUNT; i++) {
           particles[i].x = Math.random() * W;
           particles[i].y = Math.random() * H;
@@ -172,6 +211,7 @@ export default function DarkFieldCanvas() {
       clearTimeout(resizeTimer);
       window.removeEventListener("mousemove", handleMouse);
       window.removeEventListener("mouseleave", handleLeave);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
