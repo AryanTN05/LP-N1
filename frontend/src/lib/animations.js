@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { isSafari } from "@/lib/safari";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -8,6 +9,15 @@ let lenis;
 let lenisTicker;
 
 export function initSmoothScroll() {
+  // Safari: skip Lenis entirely — it fights with WebKit's native scroll
+  // and causes jank with ScrollTrigger. Native scroll works fine.
+  if (isSafari) {
+    // Just ensure ScrollTrigger updates on native scroll
+    ScrollTrigger.defaults({ scroller: window });
+    ScrollTrigger.refresh();
+    return null;
+  }
+
   lenis = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

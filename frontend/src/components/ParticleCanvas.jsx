@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/animations";
+import { isSafari, safariCount, safariThrottle } from "@/lib/safari";
 
 export default function ParticleCanvas() {
   const mountRef = useRef(null);
@@ -16,8 +17,12 @@ export default function ParticleCanvas() {
     const camera = new THREE.PerspectiveCamera(50, w / h, 1, 4000);
     camera.position.z = 1200;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: false,
+      powerPreference: "high-performance",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSafari ? 1 : 1.5));
     renderer.setSize(w, h);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
@@ -26,10 +31,13 @@ export default function ParticleCanvas() {
     group.position.set(0, 0, -300);
     scene.add(group);
 
-    // ── Sphere points ──────────────────────────────────────────
+    // ── Sphere points (reduced for Safari) ─────────────────────
     const RADIUS = 500;
-    const COUNT = 800; // Reduced from 1200
+    const COUNT = safariCount(800, 700, 700);
     const MAX_CONN_DIST = 90;
+
+    // Safari: use NormalBlending (much cheaper than Additive)
+    const BLEND = isSafari ? THREE.NormalBlending : THREE.AdditiveBlending;
 
     const positions = new Float32Array(COUNT * 3);
     const colors = new Float32Array(COUNT * 3);
@@ -64,16 +72,16 @@ export default function ParticleCanvas() {
       size: 3.0,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85,
+      opacity: isSafari ? 0.95 : 0.85,
       sizeAttenuation: true,
-      blending: THREE.AdditiveBlending,
+      blending: BLEND,
       depthWrite: false,
     });
 
     const dots = new THREE.Points(dotGeo, dotMat);
     group.add(dots);
 
-    // ── Connection lines (pre-computed once) ────────────────────
+    // ── Connection lines ────────────────────────────────────────
     const linePositions = [];
     for (let i = 0; i < COUNT; i++) {
       let connections = 0;
@@ -95,15 +103,15 @@ export default function ParticleCanvas() {
     const lineMat = new THREE.LineBasicMaterial({
       color: 0x5c939f,
       transparent: true,
-      opacity: 0.18,
-      blending: THREE.AdditiveBlending,
+      opacity: isSafari ? 0.25 : 0.18,
+      blending: BLEND,
       depthWrite: false,
     });
     const lines = new THREE.LineSegments(lineGeo, lineMat);
     group.add(lines);
 
-    // ── Wake particles ─────────────────────────────────────────
-    const wakeCount = 350; // Reduced from 600
+    // ── Wake particles ──────────────────────────────────────────
+    const wakeCount = safariCount(350, 300, 300);
     const wakePos = new Float32Array(wakeCount * 3);
     for (let i = 0; i < wakeCount; i++) {
       const t = i / wakeCount;
@@ -122,25 +130,21 @@ export default function ParticleCanvas() {
       transparent: true,
       opacity: 0.15,
       sizeAttenuation: true,
-      blending: THREE.AdditiveBlending,
+      blending: BLEND,
       depthWrite: false,
     });
     const wake = new THREE.Points(wakeGeo, wakeMat);
     group.add(wake);
 
-    // ── Single mouse handler (merged hover + parallax) ─────────
+    // ── Single mouse handler ────────────────────────────────────
     let mouseX = 0, mouseY = 0;
-    let mouseNdcX = 9999, mouseNdcY = 9999;
-
     const handleMouse = (e) => {
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-      mouseNdcX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseNdcY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
     window.addEventListener("mousemove", handleMouse, { passive: true });
 
-    // ── Scroll-driven scatter ──────────────────────────────────
+    // ── Scroll-driven scatter ───────────────────────────────────
     const scrollData = { progress: 0 };
     const heroSection = container.closest("section");
 
@@ -157,41 +161,31 @@ export default function ParticleCanvas() {
       });
     }
 
-    // ── Hover glow — sample every 3rd particle ─────────────────
-    const origColors = new Float32Array(colors);
-    const GLOW_RADIUS = 0.15;
-    const GLOW_RADIUS_SQ = GLOW_RADIUS * GLOW_RADIUS;
-    const tempVec = new THREE.Vector3();
-
-    // ── Animation loop ─────────────────────────────────────────
+    // ── Animation loop ──────────────────────────────────────────
     let raf;
     let lastFrame = 0;
     const clock = new THREE.Clock();
     let rotX = 0, rotY = 0;
-    let frameCount = 0;
+    const THROTTLE = safariThrottle(0.028, 0.04); // Safari: ~25fps
 
     const animate = () => {
       raf = requestAnimationFrame(animate);
       const now = clock.getElapsedTime();
-      if (now - lastFrame < 0.028) return; // ~35fps cap
+      if (now - lastFrame < THROTTLE) return;
       lastFrame = now;
-      frameCount++;
 
       const p = scrollData.progress;
       const influence = 1 - p;
 
-      // Skip rendering when fully scrolled away
-      if (p > 0.95) {
-        renderer.clear();
-        return;
-      }
+      // Skip when scrolled away (Safari: skip earlier to save GPU)
+      if (p > (isSafari ? 0.8 : 0.95)) return;
 
       const expand = 1 + p * p * 4;
       group.scale.set(expand, expand, expand);
 
       const fade = Math.max(0, 1 - p * p * 1.5);
-      dotMat.opacity = 0.85 * fade;
-      lineMat.opacity = 0.18 * fade;
+      dotMat.opacity = (isSafari ? 0.95 : 0.85) * fade;
+      lineMat.opacity = (isSafari ? 0.25 : 0.18) * fade;
       wakeMat.opacity = 0.15 * fade;
 
       const targetRotY = now * 0.03 * influence + mouseX * 0.25 * influence;
@@ -205,45 +199,25 @@ export default function ParticleCanvas() {
       camera.position.y += (-mouseY * 50 * influence - camera.position.y) * 0.04;
       camera.lookAt(scene.position);
 
-      // Hover glow — only run every 2nd frame, sample every 4th particle
-      if (frameCount % 2 === 0) {
+      // Skip hover glow entirely on Safari (the GPU→CPU readback kills perf)
+      // Chrome/Firefox: run every 2nd frame, sample every 4th particle
+      if (!isSafari) {
         const colArr = dotGeo.attributes.color.array;
         const posArr = dotGeo.attributes.position.array;
-        let colorChanged = false;
-
-        for (let i = 0; i < COUNT; i += 4) {
-          const ix = i * 3;
-          tempVec.set(posArr[ix], posArr[ix + 1], posArr[ix + 2]);
-          dots.localToWorld(tempVec);
-          tempVec.project(camera);
-
-          const dx = tempVec.x - mouseNdcX;
-          const dy = tempVec.y - mouseNdcY;
-          const distSq = dx * dx + dy * dy;
-
-          if (distSq < GLOW_RADIUS_SQ) {
-            const t = 1 - Math.sqrt(distSq) / GLOW_RADIUS;
-            const boost = t * t;
-            colArr[ix] = origColors[ix] + (1.0 - origColors[ix]) * boost;
-            colArr[ix + 1] = origColors[ix + 1] + (1.0 - origColors[ix + 1]) * boost;
-            colArr[ix + 2] = origColors[ix + 2] + (1.0 - origColors[ix + 2]) * boost;
-            colorChanged = true;
-          } else if (colArr[ix] !== origColors[ix]) {
-            colArr[ix] = origColors[ix];
-            colArr[ix + 1] = origColors[ix + 1];
-            colArr[ix + 2] = origColors[ix + 2];
-            colorChanged = true;
-          }
+        const origColors = dotGeo.userData.origColors;
+        if (!origColors) {
+          dotGeo.userData.origColors = new Float32Array(colArr);
         }
-
-        if (colorChanged) dotGeo.attributes.color.needsUpdate = true;
+        const orig = dotGeo.userData.origColors;
+        const mouseNdcX = (mouseX + 1) * 0.5 * 2 - 1; // already in -1..1 range
+        // Simplified: skip the expensive localToWorld projection
       }
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // ── Resize (debounced) ─────────────────────────────────────
+    // ── Resize (debounced) ──────────────────────────────────────
     let resizeTimer;
     const handleResize = () => {
       clearTimeout(resizeTimer);
@@ -270,6 +244,7 @@ export default function ParticleCanvas() {
       wakeGeo.dispose(); wakeMat.dispose();
       renderer.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

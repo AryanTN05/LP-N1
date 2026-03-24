@@ -11,6 +11,7 @@ const policiesData = [
   {
     id: "privacy",
     title: "Privacy Policy",
+    shortTitle: "Privacy",
     num: "01",
     updated: "March 2025",
     color: "var(--electric-teal)",
@@ -37,6 +38,7 @@ const policiesData = [
   {
     id: "terms",
     title: "Terms & Conditions",
+    shortTitle: "Terms",
     num: "02",
     updated: "March 2025",
     color: "var(--infrared)",
@@ -57,6 +59,7 @@ const policiesData = [
   {
     id: "cancellation",
     title: "Cancellation & Refund Policy",
+    shortTitle: "Refund",
     num: "03",
     updated: "March 2025",
     color: "#5f8f8a",
@@ -221,7 +224,7 @@ export default function PoliciesPage() {
                 }}
               >
                 <span className="hidden sm:inline">{policy.title}</span>
-                <span className="sm:hidden">{policy.num}</span>
+                <span className="sm:hidden">{policy.shortTitle}</span>
               </button>
             );
           })}

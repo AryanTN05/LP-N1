@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { isSafari, safariCount, safariThrottle } from "@/lib/safari";
 
 export default function FooterCanvas() {
   const mountRef = useRef(null);
@@ -15,48 +16,52 @@ export default function FooterCanvas() {
     const camera = new THREE.PerspectiveCamera(50, w / h, 1, 3000);
     camera.position.z = 800;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: false,
+      powerPreference: "high-performance",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSafari ? 1 : 1.5));
     renderer.setSize(w, h);
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
     const R = 260;
+    const BLEND = isSafari ? THREE.NormalBlending : THREE.AdditiveBlending;
 
-    // ── Latitude lines (reduced segments) ───────────────────────
+    // ── Latitude lines (reduced for Safari) ─────────────────────
     const latLines = [];
-    const latCount = 10; // Reduced from 14
+    const latCount = safariCount(10, 9, 6);
+    const segCount = safariCount(48, 40, 28);
     for (let i = 1; i < latCount; i++) {
       const phi = (i / latCount) * Math.PI;
       const r = R * Math.sin(phi);
       const y = R * Math.cos(phi);
-      const segments = 48; // Reduced from 80
       const pts = [];
-      for (let j = 0; j <= segments; j++) {
-        const theta = (j / segments) * Math.PI * 2;
+      for (let j = 0; j <= segCount; j++) {
+        const theta = (j / segCount) * Math.PI * 2;
         pts.push(new THREE.Vector3(r * Math.cos(theta), y, r * Math.sin(theta)));
       }
       const geo = new THREE.BufferGeometry().setFromPoints(pts);
       const mat = new THREE.LineBasicMaterial({
         color: 0x5c939f,
         transparent: true,
-        opacity: 0.2,
-        blending: THREE.AdditiveBlending,
+        opacity: isSafari ? 0.3 : 0.2,
+        blending: BLEND,
         depthWrite: false,
       });
       const line = new THREE.Line(geo, mat);
       latLines.push({ line, geo, mat });
     }
 
-    // ── Longitude lines (reduced) ───────────────────────────────
+    // ── Longitude lines ─────────────────────────────────────────
     const lngLines = [];
-    const lngCount = 12; // Reduced from 18
+    const lngCount = safariCount(12, 10, 7);
     for (let i = 0; i < lngCount; i++) {
       const theta = (i / lngCount) * Math.PI * 2;
-      const segments = 48; // Reduced from 80
       const pts = [];
-      for (let j = 0; j <= segments; j++) {
-        const phi = (j / segments) * Math.PI;
+      for (let j = 0; j <= segCount; j++) {
+        const phi = (j / segCount) * Math.PI;
         pts.push(new THREE.Vector3(
           R * Math.sin(phi) * Math.cos(theta),
           R * Math.cos(phi),
@@ -67,8 +72,8 @@ export default function FooterCanvas() {
       const mat = new THREE.LineBasicMaterial({
         color: 0x5c939f,
         transparent: true,
-        opacity: 0.15,
-        blending: THREE.AdditiveBlending,
+        opacity: isSafari ? 0.25 : 0.15,
+        blending: BLEND,
         depthWrite: false,
       });
       const line = new THREE.Line(geo, mat);
@@ -76,7 +81,7 @@ export default function FooterCanvas() {
     }
 
     // ── Surface particles ───────────────────────────────────────
-    const ptCount = 1800; // Reduced from 2800
+    const ptCount = safariCount(1800, 1500, 800);
     const positions = new Float32Array(ptCount * 3);
     const colors = new Float32Array(ptCount * 3);
 
@@ -112,13 +117,13 @@ export default function FooterCanvas() {
       transparent: true,
       opacity: 0.8,
       sizeAttenuation: true,
-      blending: THREE.AdditiveBlending,
+      blending: BLEND,
       depthWrite: false,
     });
     const globe = new THREE.Points(ptGeo, ptMat);
 
     // ── Wake particles ──────────────────────────────────────────
-    const wakeCount = 500; // Reduced from 900
+    const wakeCount = safariCount(500, 400, 200);
     const wakePos = new Float32Array(wakeCount * 3);
     for (let i = 0; i < wakeCount; i++) {
       const t = i / wakeCount;
@@ -137,7 +142,7 @@ export default function FooterCanvas() {
       transparent: true,
       opacity: 0.18,
       sizeAttenuation: true,
-      blending: THREE.AdditiveBlending,
+      blending: BLEND,
       depthWrite: false,
     });
     const wake = new THREE.Points(wakeGeo, wakeMat);
@@ -158,16 +163,17 @@ export default function FooterCanvas() {
     };
     window.addEventListener("mousemove", handleMouse, { passive: true });
 
-    // ── Animation (throttled) ───────────────────────────────────
+    // ── Animation (throttled harder for Safari) ─────────────────
     let raf;
     let lastFrame = 0;
     const clock = new THREE.Clock();
     let rotX = 0, rotY = 0;
+    const THROTTLE = safariThrottle(0.033, 0.05); // Safari: ~20fps
 
     const animate = () => {
       raf = requestAnimationFrame(animate);
       const now = clock.getElapsedTime();
-      if (now - lastFrame < 0.033) return; // ~30fps cap (footer is less critical)
+      if (now - lastFrame < THROTTLE) return;
       lastFrame = now;
 
       const targetRotY = now * 0.06 + mouseX * 0.5;
@@ -214,6 +220,7 @@ export default function FooterCanvas() {
       wakeGeo.dispose(); wakeMat.dispose();
       renderer.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

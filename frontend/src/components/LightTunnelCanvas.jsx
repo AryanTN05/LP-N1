@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
+import { isSafari, safariCount } from "@/lib/safari";
 
 /**
  * Dot-sphere field for light sections.
- * Dots distributed on a 3D sphere, projected to 2D with slow rotation.
  * Pure 2D canvas — no Three.js.
  */
 export default function LightTunnelCanvas() {
@@ -13,7 +13,7 @@ export default function LightTunnelCanvas() {
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    const dpr = Math.min(window.devicePixelRatio, 1.5); // Cap at 1.5 for perf
+    const dpr = Math.min(window.devicePixelRatio, isSafari ? 1 : 1.5);
 
     let W, H, centerX, centerY, RADIUS;
 
@@ -31,8 +31,8 @@ export default function LightTunnelCanvas() {
     };
     resize();
 
-    // ── Sphere dots (Fibonacci) — use typed arrays for speed ───
-    const COUNT = 1400; // Reduced from 2200
+    // ── Sphere dots — reduced for Safari ────────────────────────
+    const COUNT = safariCount(1400, 1200, 600);
     const goldenAngle = Math.PI * (3 - Math.sqrt(5));
 
     const sx = new Float32Array(COUNT);
@@ -53,7 +53,7 @@ export default function LightTunnelCanvas() {
       alphas[i] = 0.22 + Math.random() * 0.28;
     }
 
-    // ── Mouse ──────────────────────────────────────────────────
+    // ── Mouse ───────────────────────────────────────────────────
     let mouseX = 0, mouseY = 0;
     let currentRotX = 0, currentRotY = 0;
 
@@ -63,18 +63,21 @@ export default function LightTunnelCanvas() {
     };
     window.addEventListener("mousemove", handleMouse, { passive: true });
 
-    // ── Animation ──────────────────────────────────────────────
+    // ── Animation (throttled for Safari) ────────────────────────
     let raf;
-    // Pre-allocate fillStyle string (avoid GC pressure from template literals)
+    let lastFrame = 0;
+    const THROTTLE = isSafari ? 33 : 0; // Safari: cap at ~30fps
     const fillPrefix = "rgba(90,90,90,";
 
     const draw = (timestamp) => {
       raf = requestAnimationFrame(draw);
 
+      if (THROTTLE > 0 && timestamp - lastFrame < THROTTLE) return;
+      lastFrame = timestamp;
+
       const t = timestamp * 0.001;
       const autoAngle = t * 0.06;
 
-      // Mouse tilt
       const targetRotY = ((mouseX - centerX) / W) * 0.4;
       const targetRotX = ((mouseY - centerY) / H) * -0.3;
       currentRotX += (targetRotX - currentRotX) * 0.03;
@@ -90,8 +93,6 @@ export default function LightTunnelCanvas() {
 
       ctx.clearRect(0, 0, W, H);
 
-      // Batch all dots into a single path per alpha bucket for fewer draw calls
-      // Simple approach: just draw with minimal overhead
       for (let i = 0; i < COUNT; i++) {
         const x = sx[i] * cosRY + sz[i] * sinRY;
         const y2 = sy[i] * cosRX - (-sx[i] * sinRY + sz[i] * cosRY) * sinRX;
@@ -129,6 +130,7 @@ export default function LightTunnelCanvas() {
       window.removeEventListener("mousemove", handleMouse);
       window.removeEventListener("resize", handleResize);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

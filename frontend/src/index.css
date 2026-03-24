@@ -904,3 +904,25 @@ html.lenis, html.lenis body { height: auto; }
     -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
   }
 }
+
+/* ═══════════════ SAFARI OPTIMIZATIONS ═══════════════ */
+/* Safari: reduce backdrop-filter to lighter blur (WebKit is slow with blur) */
+@supports (-webkit-touch-callout: none) {
+  .glass-card,
+  .ethos-card,
+  .hover-card-dark,
+  .hover-card-light {
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+  }
+  /* Disable heavy hover transforms on Safari to reduce compositing */
+  .glass-card:hover,
+  .hover-card-dark:hover,
+  .hover-card-light:hover {
+    transform: translateY(-4px) !important;
+  }
+  /* Reduce grain overlay intensity */
+  .grain-overlay {
+    opacity: 0.2 !important;
+  }
+}

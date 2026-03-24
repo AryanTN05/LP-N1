@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { gsap, ScrollTrigger, initSmoothScroll, destroySmoothScroll } from "@/lib/animations";
+import { isSafari } from "@/lib/safari";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PainPointsSection from "@/components/PainPointsSection";
@@ -26,33 +27,56 @@ const LandingPage = () => {
     return () => destroySmoothScroll();
   }, [preloaderDone]);
 
-  // Scroll wipe: clip-path reveal on first light section
+  // Scroll wipe: reveal light section
   useEffect(() => {
     if (!preloaderDone) return;
 
     const wipeEl = document.getElementById("light-wipe");
     if (!wipeEl) return;
 
-    gsap.set(wipeEl, { clipPath: "inset(0 100% 0 0)" });
+    if (isSafari) {
+      // Safari: use opacity + translateX instead of clip-path (GPU composited)
+      gsap.set(wipeEl, { opacity: 0, xPercent: 5 });
 
-    const trigger = ScrollTrigger.create({
-      trigger: "#hero-sentinel",
-      start: "bottom 95%",
-      end: "bottom 0%",
-      scrub: true,
-      onUpdate: (self) => {
-        const pct = (1 - self.progress) * 100;
-        wipeEl.style.clipPath = `inset(0 ${pct.toFixed(2)}% 0 0)`;
-      },
-      onLeave: () => {
-        wipeEl.style.clipPath = "inset(0 0% 0 0)";
-      },
-      onEnterBack: () => {
-        // Let scrub re-take control
-      },
-    });
+      const trigger = ScrollTrigger.create({
+        trigger: "#hero-sentinel",
+        start: "bottom 95%",
+        end: "bottom 0%",
+        scrub: true,
+        onUpdate: (self) => {
+          wipeEl.style.opacity = self.progress;
+          wipeEl.style.transform = `translateX(${(1 - self.progress) * 5}%)`;
+        },
+        onLeave: () => {
+          wipeEl.style.opacity = "1";
+          wipeEl.style.transform = "translateX(0%)";
+        },
+      });
 
-    return () => trigger.kill();
+      return () => trigger.kill();
+    } else {
+      // Chrome/Firefox: use clip-path wipe
+      gsap.set(wipeEl, { clipPath: "inset(0 100% 0 0)" });
+
+      const trigger = ScrollTrigger.create({
+        trigger: "#hero-sentinel",
+        start: "bottom 95%",
+        end: "bottom 0%",
+        scrub: true,
+        onUpdate: (self) => {
+          const pct = (1 - self.progress) * 100;
+          wipeEl.style.clipPath = `inset(0 ${pct.toFixed(2)}% 0 0)`;
+        },
+        onLeave: () => {
+          wipeEl.style.clipPath = "inset(0 0% 0 0)";
+        },
+        onEnterBack: () => {
+          // Let scrub re-take control
+        },
+      });
+
+      return () => trigger.kill();
+    }
   }, [preloaderDone]);
 
   return (
@@ -70,7 +94,7 @@ const LandingPage = () => {
         </div>
 
         {/* LIGHT sections — wrapped for clip-path wipe */}
-        <div id="light-wipe" style={{ willChange: "clip-path", borderRadius: "clamp(16px, 3vw, 32px) clamp(16px, 3vw, 32px) 0 0" }}>
+        <div id="light-wipe" style={{ borderRadius: "clamp(16px, 3vw, 32px) clamp(16px, 3vw, 32px) 0 0" }}>
           <LightTunnelCanvas />
 
           <div className="section-light relative" style={{ marginTop: "-100vh" }}>

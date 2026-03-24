@@ -77,7 +77,7 @@ export default function ResultsSection() {
           <span className="results-label section-label-dark mb-4 block">What You Get</span>
           <h2
             ref={headingRef}
-            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-zinc-900 leading-tight"
+            className="font-heading text-[clamp(1.5rem,5vw,3.75rem)] uppercase tracking-normal sm:tracking-wide text-zinc-900 leading-tight break-words"
           >
             Results That Actually Matter
           </h2>

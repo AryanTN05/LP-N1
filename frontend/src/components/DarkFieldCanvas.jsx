@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
+import { isSafari, safariCount } from "@/lib/safari";
 
 /**
- * Constellation network background for dark sections (Process + FAQ).
- * Slowly drifting particles with faint teal connection lines.
- * Pure 2D canvas — optimized with spatial grid for O(n) connection checks.
+ * Constellation network for dark sections.
+ * Pure 2D canvas with spatial grid.
  */
 export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }) {
   const canvasRef = useRef(null);
@@ -13,7 +13,7 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    const dpr = Math.min(window.devicePixelRatio, 1.5);
+    const dpr = Math.min(window.devicePixelRatio, isSafari ? 1 : 1.5);
 
     let W, H;
     let cachedRect = null;
@@ -25,12 +25,14 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cachedRect = null; // Invalidate cached rect
+      cachedRect = null;
     };
     resize();
 
-    // ── Particles ──────────────────────────────────────────────
-    const COUNT = particleCount || Math.min(90, Math.round((W * H) / 16000));
+    // ── Particles (reduced for Safari) ──────────────────────────
+    const defaultCount = Math.min(90, Math.round((W * H) / 16000));
+    const baseCount = particleCount || defaultCount;
+    const COUNT = isSafari ? Math.round(baseCount * 0.6) : baseCount;
     const CONNECTION_DIST = 160;
     const CONNECTION_DIST_SQ = CONNECTION_DIST * CONNECTION_DIST;
     const particles = [];
@@ -49,7 +51,7 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
       });
     }
 
-    // ── Spatial grid for O(n) neighbor lookups ─────────────────
+    // ── Spatial grid ────────────────────────────────────────────
     const CELL_SIZE = CONNECTION_DIST;
     let gridCols, gridRows, grid;
 
@@ -69,11 +71,10 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
       const row = (y / CELL_SIZE) | 0;
       if (col < 0 || col >= gridCols || row < 0 || row >= gridRows) return;
       const key = row * gridCols + col;
-      // Simple linked-list style: store as [idx, next]
       grid[key] = { idx, next: grid[key] };
     };
 
-    // ── Mouse (cached rect) ────────────────────────────────────
+    // ── Mouse ───────────────────────────────────────────────────
     let mouseX = -9999, mouseY = -9999;
     const MOUSE_RADIUS = 200;
     const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS;
@@ -84,44 +85,45 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
       mouseY = e.clientY - cachedRect.top;
     };
     const handleLeave = () => { mouseX = -9999; mouseY = -9999; };
-    const handleScroll = () => { cachedRect = null; }; // Invalidate on scroll
+    const handleScroll = () => { cachedRect = null; };
 
     window.addEventListener("mousemove", handleMouse, { passive: true });
     window.addEventListener("mouseleave", handleLeave);
     window.addEventListener("scroll", handleScroll, { passive: true });
 
-    // ── Animation ──────────────────────────────────────────────
+    // ── Animation (throttled for Safari) ────────────────────────
     let raf;
+    let lastFrame = 0;
+    const THROTTLE = isSafari ? 33 : 0; // Safari: ~30fps
 
     const draw = (timestamp) => {
       raf = requestAnimationFrame(draw);
-      const t = timestamp * 0.001;
 
+      if (THROTTLE > 0 && timestamp - lastFrame < THROTTLE) return;
+      lastFrame = timestamp;
+
+      const t = timestamp * 0.001;
       ctx.clearRect(0, 0, W, H);
 
-      // Update positions & build spatial grid
       clearGrid();
       for (let i = 0; i < COUNT; i++) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-
         if (p.x < -20) p.x = W + 20;
         if (p.x > W + 20) p.x = -20;
         if (p.y < -20) p.y = H + 20;
         if (p.y > H + 20) p.y = -20;
-
         insertGrid(i, p.x, p.y);
       }
 
-      // Draw connections using spatial grid (O(n) instead of O(n²))
+      // Connections
       ctx.lineWidth = 0.6;
       for (let i = 0; i < COUNT; i++) {
         const a = particles[i];
         const col = (a.x / CELL_SIZE) | 0;
         const row = (a.y / CELL_SIZE) | 0;
 
-        // Check 3x3 neighborhood
         for (let dr = -1; dr <= 1; dr++) {
           for (let dc = -1; dc <= 1; dc++) {
             const nr = row + dr;
@@ -141,7 +143,6 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
                   const dist = Math.sqrt(distSq);
                   let lineAlpha = (1 - dist / CONNECTION_DIST) * 0.25 * opacityMultiplier;
 
-                  // Mouse brightness (skip sqrt with squared comparison)
                   const midX = (a.x + b.x) * 0.5;
                   const midY = (a.y + b.y) * 0.5;
                   const mDx = midX - mouseX;
@@ -164,7 +165,7 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
         }
       }
 
-      // Draw dots
+      // Dots
       for (let i = 0; i < COUNT; i++) {
         const p = particles[i];
         const breathe = Math.sin(t * 0.8 + p.phase) * 0.1;
@@ -214,6 +215,7 @@ export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

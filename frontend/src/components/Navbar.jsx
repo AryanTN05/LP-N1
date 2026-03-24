@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, X, Menu } from "lucide-react";
 import { gsap } from "@/lib/animations";
+import { isSafari } from "@/lib/safari";
 
 const CAL_LINK = "https://cal.com/aryantn01/30min";
 
@@ -46,8 +47,22 @@ export default function Navbar() {
 
       if (!nowInLight) {
         nav.style.background = `rgba(12,12,14,${(p * 0.52).toFixed(2)})`;
-        nav.style.backdropFilter = `blur(${(p * 28) | 0}px) saturate(${(100 + p * 80) | 0}%)`;
-        nav.style.webkitBackdropFilter = nav.style.backdropFilter;
+        // Safari: don't animate backdrop-filter every frame (kills performance)
+        // Instead set a static blur once it crosses a threshold
+        if (isSafari) {
+          if (p > 0.1 && !nav.dataset.blurred) {
+            nav.style.backdropFilter = "blur(20px) saturate(160%)";
+            nav.style.webkitBackdropFilter = "blur(20px) saturate(160%)";
+            nav.dataset.blurred = "1";
+          } else if (p <= 0.1 && nav.dataset.blurred) {
+            nav.style.backdropFilter = "none";
+            nav.style.webkitBackdropFilter = "none";
+            delete nav.dataset.blurred;
+          }
+        } else {
+          nav.style.backdropFilter = `blur(${(p * 28) | 0}px) saturate(${(100 + p * 80) | 0}%)`;
+          nav.style.webkitBackdropFilter = nav.style.backdropFilter;
+        }
         nav.style.borderBottomColor = `rgba(255,255,255,${(p * 0.08).toFixed(2)})`;
         nav.style.boxShadow = p > 0.05
           ? `0 4px ${(p * 24) | 0}px rgba(0,0,0,${(p * 0.3).toFixed(1)})`
