@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
  * Slowly drifting particles with faint teal connection lines.
  * Pure 2D canvas — optimized with spatial grid for O(n) connection checks.
  */
-export default function DarkFieldCanvas() {
+export default function DarkFieldCanvas({ particleCount, opacityMultiplier = 1 }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function DarkFieldCanvas() {
     resize();
 
     // ── Particles ──────────────────────────────────────────────
-    const COUNT = Math.min(90, Math.round((W * H) / 16000)); // Reduced from 120
+    const COUNT = particleCount || Math.min(90, Math.round((W * H) / 16000));
     const CONNECTION_DIST = 160;
     const CONNECTION_DIST_SQ = CONNECTION_DIST * CONNECTION_DIST;
     const particles = [];
@@ -139,7 +139,7 @@ export default function DarkFieldCanvas() {
 
                 if (distSq < CONNECTION_DIST_SQ) {
                   const dist = Math.sqrt(distSq);
-                  let lineAlpha = (1 - dist / CONNECTION_DIST) * 0.25;
+                  let lineAlpha = (1 - dist / CONNECTION_DIST) * 0.25 * opacityMultiplier;
 
                   // Mouse brightness (skip sqrt with squared comparison)
                   const midX = (a.x + b.x) * 0.5;
@@ -178,7 +178,7 @@ export default function DarkFieldCanvas() {
           glow = (1 - Math.sqrt(distSq) / MOUSE_RADIUS) * 0.5;
         }
 
-        const finalAlpha = Math.min(1, alpha * 0.8 + glow);
+        const finalAlpha = Math.min(1, (alpha * 0.8 + glow) * opacityMultiplier);
         const r = glow > 0.1 ? Math.round(92 + glow * 163) : 92;
         const g = glow > 0.1 ? Math.round(147 + glow * 108) : 147;
         const b = glow > 0.1 ? Math.round(159 + glow * 96) : 159;
