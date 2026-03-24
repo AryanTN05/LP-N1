@@ -36,7 +36,7 @@ const LandingPage = () => {
       trigger: "#hero-sentinel",
       start: "bottom 95%",
       end: "bottom 0%",
-      scrub: 0.6,
+      scrub: true,
       onUpdate: (self) => {
         const pct = (1 - self.progress) * 100;
         wipeEl.style.clipPath = `inset(0 ${pct.toFixed(2)}% 0 0)`;
