@@ -36,16 +36,16 @@ export default function Navbar() {
       const p = Math.min(current / FADE_RANGE, 1); // 0 → 1
 
       // Interpolate styles directly — no state flip, no class toggle
-      nav.style.background        = `rgba(12,12,14,${(p * 0.52).toFixed(3)})`;
-      nav.style.backdropFilter    = `blur(${(p * 28).toFixed(1)}px) saturate(${(100 + p * 80).toFixed(0)}%)`;
+      nav.style.background = `rgba(12,12,14,${(p * 0.52).toFixed(3)})`;
+      nav.style.backdropFilter = `blur(${(p * 28).toFixed(1)}px) saturate(${(100 + p * 80).toFixed(0)}%)`;
       nav.style.webkitBackdropFilter = nav.style.backdropFilter;
       nav.style.borderBottomColor = `rgba(255,255,255,${(p * 0.08).toFixed(3)})`;
-      nav.style.boxShadow         = p > 0.05
+      nav.style.boxShadow = p > 0.05
         ? `0 4px ${(p * 24).toFixed(0)}px rgba(0,0,0,${(p * 0.3).toFixed(2)})`
         : "none";
       // Shrink padding as user scrolls
       const py = (1.25 - p * 0.5).toFixed(3);
-      nav.style.paddingTop    = `${py}rem`;
+      nav.style.paddingTop = `${py}rem`;
       nav.style.paddingBottom = `${py}rem`;
 
       rafId = requestAnimationFrame(tick);
