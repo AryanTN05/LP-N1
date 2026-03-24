@@ -753,6 +753,20 @@ html.lenis, html.lenis body { height: auto; }
   .work-slide.active { width: 85%; }
 }
 
+/* ═══════════════ LOGO HOVER GLOW ═══════════════ */
+.logo-glow {
+  text-shadow: none;
+}
+.logo-tn {
+  color: var(--pulse-ash);
+}
+.logo-glow:hover {
+  text-shadow: 0 0 20px rgba(92,147,159,0.5), 0 0 40px rgba(92,147,159,0.25);
+}
+.logo-glow:hover .logo-tn {
+  color: var(--electric-teal);
+}
+
 /* ═══════════════ SELECTION ═══════════════ */
 ::selection {
   background-color: rgba(92, 147, 159, 0.3);

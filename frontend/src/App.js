@@ -15,6 +15,7 @@ import GrainOverlay from "@/components/GrainOverlay";
 import Preloader from "@/components/Preloader";
 import LightTunnelCanvas from "@/components/LightTunnelCanvas";
 import DarkFieldCanvas from "@/components/DarkFieldCanvas";
+import PoliciesPage from "@/components/PoliciesPage";
 
 const LandingPage = () => {
   const [preloaderDone, setPreloaderDone] = useState(false);
@@ -111,6 +112,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/policies" element={<PoliciesPage />} />
         </Routes>
       </BrowserRouter>
     </div>

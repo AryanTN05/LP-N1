@@ -139,9 +139,9 @@ export default function Navbar() {
         <div className="px-6 md:px-12 flex items-center justify-between">
           <a
             href="#"
-            className="font-heading text-xl tracking-widest uppercase text-white hover:opacity-70 transition-opacity"
+            className="logo-glow font-heading text-xl tracking-widest uppercase text-white font-bold transition-all duration-500"
           >
-            Aryan <span className="font-sans font-light text-zinc-400">TN</span>
+            Aryan <span className="logo-tn transition-colors duration-500">TN</span>
           </a>
 
           <div className="hidden md:flex items-center gap-10">

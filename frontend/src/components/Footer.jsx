@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ArrowRight, Mail, Linkedin } from "lucide-react";
+import { Link } from "react-router-dom";
 import { gsap } from "@/lib/animations";
 import FooterCanvas from "@/components/FooterCanvas";
 
@@ -104,21 +105,14 @@ export default function Footer() {
       {/* Bottom bar */}
       <div
         className="px-6 py-8"
-        style={{ background: "var(--rich-carbon)", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+        style={{ background: "var(--rich-carbon)" }}
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="font-heading text-xl uppercase tracking-widest text-zinc-300">
-            Aryan <span className="font-sans font-light text-zinc-500">TN</span>
-          </span>
-
-          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
-            © {new Date().getFullYear()} All rights reserved
-          </p>
-
-          <div className="flex items-center gap-6">
+          {/* Left — Mail & LinkedIn */}
+          <div className="flex items-center gap-4">
             <a
               href="mailto:aryan.tn01@gmail.com"
-              className="text-zinc-500 hover:text-[#5c939f] transition-colors duration-300"
+              className="flex items-center justify-center w-9 h-9 rounded-full border border-zinc-700 text-zinc-400 hover:border-[var(--electric-teal)] hover:text-white hover:shadow-[0_0_16px_rgba(92,147,159,0.4)] transition-all duration-300"
             >
               <Mail className="w-4 h-4" />
             </a>
@@ -126,11 +120,24 @@ export default function Footer() {
               href="https://www.linkedin.com/in/aryan-tn/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-zinc-500 hover:text-[#5c939f] transition-colors duration-300"
+              className="flex items-center justify-center w-9 h-9 rounded-full border border-zinc-700 text-zinc-400 hover:border-[var(--electric-teal)] hover:text-white hover:shadow-[0_0_16px_rgba(92,147,159,0.4)] transition-all duration-300"
             >
               <Linkedin className="w-4 h-4" />
             </a>
           </div>
+
+          {/* Center — Name with hover glow */}
+          <span className="logo-glow font-heading text-xl uppercase tracking-widest text-white font-bold transition-all duration-500 cursor-default">
+            Aryan <span className="logo-tn transition-colors duration-500">TN</span>
+          </span>
+
+          {/* Right — Policies */}
+          <Link
+            to="/policies"
+            className="font-mono text-[11px] uppercase tracking-[0.18em] px-5 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-[var(--electric-teal)] hover:text-white transition-all duration-300"
+          >
+            Policies / T&C
+          </Link>
         </div>
       </div>
     </footer>
