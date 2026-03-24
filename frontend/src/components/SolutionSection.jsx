@@ -103,7 +103,7 @@ export default function SolutionSection() {
         </div>
 
         {/* Cards */}
-        <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {focusItems.map((item, i) => (
             <div
               key={i}

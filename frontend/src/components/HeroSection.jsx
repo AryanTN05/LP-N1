@@ -149,6 +149,21 @@ export default function HeroSection() {
         {/* Mobile only — subtext at bottom */}
         <div className="md:hidden mt-8 border-l border-[var(--border-dark)] pl-5 relative">
           <div className="absolute left-[-1px] top-2 bottom-2 w-[1px] bg-gradient-to-b from-transparent via-[var(--electric-teal)] to-transparent opacity-40" />
+          
+          {/* Badge for mobile */}
+          <div className="inline-flex items-center gap-2 mb-4">
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--electric-teal)", boxShadow: "0 0 8px rgba(92,147,159,0.9)" }}
+            />
+            <span
+              className="font-mono uppercase tracking-[0.2em]"
+              style={{ fontSize: "11px", fontWeight: 700, color: "var(--electric-teal)" }}
+            >
+              Make AI Your Default Setting
+            </span>
+          </div>
+
           <p className="text-[14.5px] text-zinc-400 leading-[1.8] font-light">
             <span className="text-white font-medium block mb-1">Stop manual prospecting.</span>
             I build <span className="text-[var(--electric-teal)] font-medium">autonomous AI systems</span> that find, qualify, and book meetings with your ideal clients — so you focus on <span className="text-white font-medium">closing</span>.

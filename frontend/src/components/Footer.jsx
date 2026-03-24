@@ -73,7 +73,7 @@ export default function Footer() {
               </span>
               <h2
                 ref={headingRef}
-                className="font-heading text-4xl sm:text-5xl lg:text-5xl uppercase tracking-wide leading-tight mb-5"
+                className="font-heading text-3xl sm:text-4xl md:text-5xl uppercase tracking-wide leading-tight mb-5"
                 style={{ color: "#0a0a0a" }}
               >
                 Build Your AI Outbound Engine

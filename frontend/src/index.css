@@ -636,7 +636,6 @@ html.lenis, html.lenis body { height: auto; }
   align-items: flex-start;
   padding: 0 2.5rem;
   transform: translateX(100%);
-  transition: transform 0.5s var(--easing);
 }
 .mobile-menu.open {
   transform: translateX(0);

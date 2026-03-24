@@ -35,18 +35,21 @@ export default function Navbar() {
       current += (scrollY - current) * 0.1;
       const p = Math.min(current / FADE_RANGE, 1); // 0 → 1
 
-      // Interpolate styles directly — no state flip, no class toggle
-      nav.style.background = `rgba(12,12,14,${(p * 0.52).toFixed(3)})`;
-      nav.style.backdropFilter = `blur(${(p * 28).toFixed(1)}px) saturate(${(100 + p * 80).toFixed(0)}%)`;
-      nav.style.webkitBackdropFilter = nav.style.backdropFilter;
-      nav.style.borderBottomColor = `rgba(255,255,255,${(p * 0.08).toFixed(3)})`;
-      nav.style.boxShadow = p > 0.05
-        ? `0 4px ${(p * 24).toFixed(0)}px rgba(0,0,0,${(p * 0.3).toFixed(2)})`
-        : "none";
-      // Shrink padding as user scrolls
-      const py = (1.25 - p * 0.5).toFixed(3);
-      nav.style.paddingTop = `${py}rem`;
-      nav.style.paddingBottom = `${py}rem`;
+      // Only interpolate main nav if we aren't heavily past the threshold
+      if (!inLight) {
+        // Interpolate styles directly
+        nav.style.background = `rgba(12,12,14,${(p * 0.52).toFixed(3)})`;
+        nav.style.backdropFilter = `blur(${(p * 28).toFixed(1)}px) saturate(${(100 + p * 80).toFixed(0)}%)`;
+        nav.style.webkitBackdropFilter = nav.style.backdropFilter;
+        nav.style.borderBottomColor = `rgba(255,255,255,${(p * 0.08).toFixed(3)})`;
+        nav.style.boxShadow = p > 0.05
+          ? `0 4px ${(p * 24).toFixed(0)}px rgba(0,0,0,${(p * 0.3).toFixed(2)})`
+          : "none";
+        // Shrink padding as user scrolls
+        const py = (1.25 - p * 0.5).toFixed(3);
+        nav.style.paddingTop = `${py}rem`;
+        nav.style.paddingBottom = `${py}rem`;
+      }
 
       rafId = requestAnimationFrame(tick);
     };
@@ -63,16 +66,14 @@ export default function Navbar() {
       cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [inLight]);
 
   // ── Pill in / full-nav out when entering light section ────
   useEffect(() => {
     if (!pillRef.current || !navRef.current) return;
 
-    const isDesktop = window.innerWidth >= 768;
-
-    if (inLight && isDesktop) {
-      // Desktop: hide nav, show pill
+    if (inLight) {
+      // Hide full nav, show pill for BOTH desktop and mobile
       gsap.to(navRef.current, {
         opacity: 0, y: -8,
         duration: 0.45, ease: "power3.inOut",
@@ -84,19 +85,6 @@ export default function Navbar() {
         { opacity: 0, y: -16, scale: 0.96 },
         { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power3.out", delay: 0.12 }
       );
-    } else if (inLight && !isDesktop) {
-      // Mobile: keep nav visible with full glassmorphism
-      navRef.current.style.pointerEvents = "auto";
-      gsap.to(navRef.current, {
-        opacity: 1, y: 0,
-        duration: 0.3, ease: "power3.out",
-      });
-      // Force glass background on mobile when scrolled
-      navRef.current.style.background = "rgba(12,12,14,0.52)";
-      navRef.current.style.backdropFilter = "blur(28px) saturate(180%)";
-      navRef.current.style.webkitBackdropFilter = "blur(28px) saturate(180%)";
-      navRef.current.style.borderBottomColor = "rgba(255,255,255,0.08)";
-      navRef.current.style.boxShadow = "0 4px 24px rgba(0,0,0,0.3)";
     } else {
       // Not in light section: show nav, hide pill
       gsap.to(pillRef.current, {
@@ -117,8 +105,8 @@ export default function Navbar() {
     if (!menuRef.current) return;
     const links = menuLinksRef.current.filter(Boolean);
     if (menuOpen) {
-      gsap.set(menuRef.current, { display: "flex" });
-      gsap.to(menuRef.current, { x: "0%", duration: 0.5, ease: "power3.out" });
+      gsap.set(menuRef.current, { display: "flex", xPercent: 100, x: 0 });
+      gsap.to(menuRef.current, { xPercent: 0, duration: 0.5, ease: "power3.out" });
       gsap.fromTo(
         links,
         { y: 40, opacity: 0 },
@@ -128,7 +116,7 @@ export default function Navbar() {
     } else {
       gsap.to(links, { y: 20, opacity: 0, duration: 0.3, stagger: 0.05, ease: "power2.in" });
       gsap.to(menuRef.current, {
-        x: "100%", duration: 0.45, ease: "power3.in", delay: 0.15,
+        xPercent: 100, duration: 0.45, ease: "power3.in", delay: 0.15,
         onComplete: () => {
           if (menuRef.current) gsap.set(menuRef.current, { display: "none" });
         },
@@ -183,11 +171,12 @@ export default function Navbar() {
 
           {/* Hamburger — mobile */}
           <button
-            className="md:hidden text-white p-1"
+            className="md:hidden text-white p-2 relative z-50"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
+            style={{ pointerEvents: "auto" }}
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-6 h-6" />
           </button>
         </div>
       </nav>
@@ -195,10 +184,10 @@ export default function Navbar() {
       {/* ── Pill nav (light-section state) ──────────────── */}
       <div
         ref={pillRef}
-        className="fixed top-5 left-1/2 z-50 hidden md:flex items-center gap-6 px-6 py-3 rounded-full"
+        className="fixed top-4 md:top-5 left-1/2 z-50 flex items-center justify-between w-[90%] md:w-auto px-5 py-2.5 md:py-3 rounded-full"
         style={{
           transform: "translateX(-50%)",
-          background: "rgba(14, 14, 16, 0.5)",
+          background: "rgba(14, 14, 16, 0.7)",
           backdropFilter: "blur(28px) saturate(180%)",
           WebkitBackdropFilter: "blur(28px) saturate(180%)",
           border: "1px solid rgba(255,255,255,0.1)",
@@ -207,60 +196,72 @@ export default function Navbar() {
           boxShadow: "0 4px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
       >
+        {/* Left Side: Logo */}
         <a
           href="#"
-          className="font-heading text-sm tracking-widest uppercase text-white hover:opacity-70 transition-opacity mr-2"
+          className="font-heading text-sm md:text-sm tracking-widest uppercase text-white hover:opacity-70 transition-opacity"
         >
           ATN
         </a>
 
-        <div className="w-px h-4 bg-white/10" />
+        {/* Center: Desktop Links Container */}
+        <div className="hidden md:flex items-center gap-6 mx-4">
+          <div className="w-px h-4 bg-white/10" />
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 hover:text-white transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
+          <div className="w-px h-4 bg-white/10" />
+        </div>
 
-        {navLinks.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 hover:text-white transition-colors"
-          >
-            {link.label}
-          </a>
-        ))}
-
-        <div className="w-px h-4 bg-white/10" />
-
+        {/* Right Side: Desktop CTA */}
         <a
           href={CAL_LINK}
           target="_blank"
           rel="noopener noreferrer"
-          className="pill-cta font-mono text-[10px] uppercase tracking-[0.18em] text-white px-4 py-1.5 rounded-full"
+          className="hidden md:block pill-cta font-mono text-[10px] uppercase tracking-[0.18em] text-white px-4 py-1.5 rounded-full"
           style={{ background: "var(--electric-teal)" }}
         >
           Book a Call
         </a>
+
+        {/* Right Side: Mobile Hamburger in Pill */}
+        <button
+          className="md:hidden text-white p-1"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
       </div>
 
       {/* ── Mobile full-screen menu ──────────────────────── */}
       <div
         ref={menuRef}
         className="mobile-menu"
-        style={{ display: "none", transform: "translateX(100%)" }}
+        style={{ display: "none" }}
         aria-hidden={!menuOpen}
       >
         <button
           onClick={() => setMenuOpen(false)}
-          className="absolute top-6 right-6 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-6 right-6 text-zinc-400 hover:text-white transition-colors z-[210] p-2"
           aria-label="Close menu"
         >
-          <X className="w-6 h-6" />
+          <X className="w-8 h-8" />
         </button>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4 mt-12 w-full">
           {navLinks.map((link, i) => (
             <a
               key={link.label}
               href={link.href}
               ref={(el) => (menuLinksRef.current[i] = el)}
-              className="mobile-menu-link"
+              className="mobile-menu-link text-4xl font-heading uppercase text-white"
               onClick={() => handleNavClick(link.href)}
             >
               {link.label}
@@ -271,8 +272,7 @@ export default function Navbar() {
             href={CAL_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="mobile-menu-link mt-4"
-            style={{ fontSize: "clamp(1rem, 4vw, 1.5rem)", color: "var(--electric-teal)" }}
+            className="mobile-menu-link mt-8 text-2xl font-mono text-[var(--electric-teal)]"
             onClick={() => setMenuOpen(false)}
           >
             Book a Call →
