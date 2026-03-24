@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import GrainOverlay from "@/components/GrainOverlay";
 import Preloader from "@/components/Preloader";
 import LightTunnelCanvas from "@/components/LightTunnelCanvas";
+import DarkFieldCanvas from "@/components/DarkFieldCanvas";
 
 const LandingPage = () => {
   const [preloaderDone, setPreloaderDone] = useState(false);
@@ -91,8 +92,11 @@ const LandingPage = () => {
 
           {/* DARK: Process + FAQ + Footer — single block with rounded top corners */}
           <div className="section-dark" style={{ borderRadius: "clamp(24px, 4vw, 48px) clamp(24px, 4vw, 48px) 0 0", overflow: "hidden", position: "relative", zIndex: 2 }}>
-            <ProcessSection />
-            <FaqSection />
+            <div style={{ position: "relative" }}>
+              <DarkFieldCanvas />
+              <ProcessSection />
+              <FaqSection />
+            </div>
             <Footer />
           </div>
         </div>

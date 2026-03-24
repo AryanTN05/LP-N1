@@ -115,9 +115,9 @@ export default function FaqSection() {
       ref={sectionRef}
       id="faq"
       data-testid="faq-section"
-      className="py-32 lg:py-44 px-6 relative"
+      className="pt-10 lg:pt-16 pb-32 lg:pb-44 px-6 relative"
+      style={{ background: "transparent", color: "var(--text-light)" }}
     >
-      <div className="section-divider max-w-4xl mx-auto mb-20" />
 
       <div className="max-w-3xl mx-auto">
         <div className="mb-16">

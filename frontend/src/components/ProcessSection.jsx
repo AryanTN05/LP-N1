@@ -106,10 +106,9 @@ export default function ProcessSection() {
       ref={sectionRef}
       id="process"
       data-testid="process-section"
-      className="py-32 lg:py-44 px-6 relative overflow-hidden section-dark"
+      className="py-32 lg:py-44 px-6 relative overflow-hidden"
+      style={{ background: "transparent", color: "var(--text-light)" }}
     >
-      <div className="dot-burst" />
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-20 md:mb-32 text-center md:text-left max-w-3xl">
