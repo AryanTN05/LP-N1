@@ -82,8 +82,13 @@ body {
   color: var(--text-light);
 }
 
-.section-light {
+#light-wipe {
   background: var(--bg-light);
+  position: relative;
+}
+
+.section-light {
+  background: transparent;
   color: var(--text-dark);
 }
 

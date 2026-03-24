@@ -74,10 +74,10 @@ export default function ResultsSection() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Heading block */}
         <div className="mb-20 max-w-2xl">
-          <span className="results-label section-label mb-4 block">What You Get</span>
+          <span className="results-label section-label-dark mb-4 block">What You Get</span>
           <h2
             ref={headingRef}
-            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-white leading-tight"
+            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-zinc-900 leading-tight"
           >
             Results That Actually Matter
           </h2>
@@ -86,7 +86,7 @@ export default function ResultsSection() {
             className="mt-8 h-px bg-gradient-to-r from-[#5c939f]/60 to-transparent"
             style={{ transform: "scaleX(0)", transformOrigin: "left center" }}
           />
-          <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 leading-relaxed max-w-md mt-6">
+          <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-600 leading-relaxed max-w-md mt-6">
             No vanity metrics. No excuses. Just a predictable flow of
             qualified conversations with people who need what you sell.
           </p>
@@ -98,13 +98,13 @@ export default function ResultsSection() {
             <div
               key={i}
               data-testid={`result-item-${i}`}
-              className="results-card hover-card-dark rounded-[20px] p-8 md:p-10 flex flex-col gap-6"
+              className="results-card hover-card-light rounded-[20px] p-8 md:p-10 flex flex-col gap-6"
               style={{
                 background: card.color,
                 backdropFilter: "blur(28px) saturate(160%)",
                 WebkitBackdropFilter: "blur(28px) saturate(160%)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.4)",
                 color: card.textColor,
               }}
             >

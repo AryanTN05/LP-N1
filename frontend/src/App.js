@@ -13,6 +13,7 @@ import FaqSection from "@/components/FaqSection";
 import Footer from "@/components/Footer";
 import GrainOverlay from "@/components/GrainOverlay";
 import Preloader from "@/components/Preloader";
+import LightTunnelCanvas from "@/components/LightTunnelCanvas";
 
 const LandingPage = () => {
   const [preloaderDone, setPreloaderDone] = useState(false);
@@ -68,21 +69,23 @@ const LandingPage = () => {
 
         {/* LIGHT sections — wrapped for clip-path wipe */}
         <div id="light-wipe" style={{ willChange: "clip-path" }}>
-          <div className="section-light dot-float-bg">
+          <LightTunnelCanvas />
+          
+          <div className="section-light relative">
             <PainPointsSection />
           </div>
 
-          <div className="section-light dot-float-bg">
+          <div className="section-light relative">
             <SolutionSection />
           </div>
 
-          {/* DARK: Results */}
-          <div className="section-dark">
+          {/* LIGHT: Results */}
+          <div className="section-light relative">
             <ResultsSection />
           </div>
 
           {/* LIGHT: Why Me */}
-          <div className="section-light dot-float-bg">
+          <div className="section-light relative">
             <WhyMeSection />
           </div>
 

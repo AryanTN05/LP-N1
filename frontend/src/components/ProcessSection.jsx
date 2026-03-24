@@ -9,41 +9,30 @@ const steps = [
     number: "01",
     title: "Discovery & Audit",
     desc: "We hop on a 30-min call. I learn your ICP, offer, and current outbound setup. I map out exactly what your AI lead gen system needs to look like.",
-    color: "rgba(95,143,138,0.88)",
-    accent: "#0a0a0a",
-    textColor: "#0a0a0a",
   },
   {
     number: "02",
     title: "Infrastructure Build",
     desc: "I set up your complete AI sales stack — domains, inbox warming, deliverability, Clay enrichment flows, Apollo prospecting, n8n automations, CRM, and Slack notifications.",
-    color: "rgba(237,109,64,0.88)",
-    accent: "#0a0a0a",
-    textColor: "#0a0a0a",
   },
   {
     number: "03",
     title: "Campaign Launch",
     desc: "Campaigns go live. I handle copywriting, prospect research, personalization, A/B testing, and daily optimization. You get full visibility into every metric.",
-    color: "rgba(10,10,10,0.92)",
-    accent: "#5c939f",
-    textColor: "#ffffff",
   },
   {
     number: "04",
     title: "Leads Flow In",
     desc: "Qualified decision-makers start appearing in your calendar. You get Slack pings for every hot lead. Show up, run the call, close the deal.",
-    color: "rgba(30,45,53,0.92)",
-    accent: "#5c939f",
-    textColor: "#ffffff",
   },
 ];
 
 export default function ProcessSection() {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
-  const lineRef = useRef(null);
-  const cardRefs = useRef([]);
+  const lineRefDesktop = useRef(null);
+  const lineRefMobile = useRef(null);
+  const stepRefs = useRef([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -63,38 +52,50 @@ export default function ProcessSection() {
           scrollTrigger: { trigger: sectionRef.current, start: "top 72%", once: true } }
       );
 
-      // Vertical line grows downward
-      if (lineRef.current) {
+      // Horizontal line grows left to right (Desktop)
+      if (lineRefDesktop.current) {
         gsap.fromTo(
-          lineRef.current,
-          { scaleY: 0, transformOrigin: "top center" },
+          lineRefDesktop.current,
+          { scaleX: 0, transformOrigin: "left center" },
           {
-            scaleY: 1,
-            duration: 1.6,
+            scaleX: 1,
+            duration: 1.5,
             ease: "power3.inOut",
-            scrollTrigger: { trigger: ".process-steps", start: "top 78%", once: true },
+            scrollTrigger: { trigger: ".process-steps-container", start: "top 78%", once: true },
           }
         );
       }
 
-      // Each card slides up individually as it enters viewport
-      cardRefs.current.forEach((card) => {
-        if (!card) return;
+      // Vertical line grows top to bottom (Mobile)
+      if (lineRefMobile.current) {
         gsap.fromTo(
-          card,
-          { y: 60, opacity: 0 },
+          lineRefMobile.current,
+          { scaleY: 0, transformOrigin: "top center" },
           {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 85%",
-              once: true,
-            },
+            scaleY: 1,
+            duration: 1.5,
+            ease: "power3.inOut",
+            scrollTrigger: { trigger: ".process-steps-container", start: "top 78%", once: true },
           }
         );
+      }
+
+      // Each step fades in sequentially
+      stepRefs.current.forEach((step, i) => {
+        if (!step) return;
+        const dot = step.querySelector(".step-dot");
+        const content = step.querySelector(".step-content");
+        
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: step,
+            start: "top 85%",
+            once: true,
+          }
+        });
+
+        tl.fromTo(dot, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" })
+          .fromTo(content, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, "-=0.2");
       });
     }, sectionRef);
     return () => ctx.revert();
@@ -105,87 +106,74 @@ export default function ProcessSection() {
       ref={sectionRef}
       id="process"
       data-testid="process-section"
-      className="py-32 lg:py-44 px-6 relative overflow-hidden"
+      className="py-32 lg:py-44 px-6 relative overflow-hidden section-dark"
     >
       <div className="dot-burst" />
 
-      <div className="max-w-3xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-20">
-          <span className="process-label section-label mb-4 block">How It Works</span>
+        <div className="mb-20 md:mb-32 text-center md:text-left max-w-3xl">
+          <span className="process-label section-label mb-4 block text-zinc-400">How It Works</span>
           <h2
             ref={headingRef}
-            className="font-heading text-[clamp(2rem,5vw,3.75rem)] uppercase tracking-wide text-white leading-tight"
+            className="font-heading text-[clamp(2.5rem,5vw,4rem)] uppercase tracking-wide text-white leading-[1.05]"
           >
-            From First Call to<br />Qualified Leads
+            From First Call to<br className="hidden md:block" /> Qualified Leads
           </h2>
-          <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 mt-6 leading-relaxed">
-            From first call to qualified leads in under 30 days.
+          <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--electric-teal)] mt-8 leading-relaxed">
+            A battle-tested 4-step framework. Under 30 days to launch.
           </p>
         </div>
 
-        {/* Timeline + Cards */}
-        <div className="process-steps relative pl-12 sm:pl-14 md:pl-16">
-          {/* Vertical line */}
+        {/* Timeline Container */}
+        <div className="process-steps-container relative w-full">
+          
+          {/* Desktop Horizontal Line */}
+          <div className="hidden lg:block absolute top-[28px] left-0 right-0 h-px bg-white/10" />
           <div
-            ref={lineRef}
-            className="absolute left-3 sm:left-4 top-4 bottom-4 w-px"
-            style={{
-              background: "linear-gradient(180deg, #5c939f 0%, rgba(92,147,159,0.08) 100%)",
-              transform: "scaleY(0)",
-            }}
+            ref={lineRefDesktop}
+            className="hidden lg:block absolute top-[28px] left-0 right-0 h-px bg-gradient-to-r from-[var(--electric-teal)] to-transparent"
+            style={{ transform: "scaleX(0)" }}
           />
 
-          <div className="flex flex-col gap-6">
+          {/* Mobile Vertical Line */}
+          <div className="lg:hidden absolute left-[27px] top-0 bottom-0 w-px bg-white/10" />
+          <div
+            ref={lineRefMobile}
+            className="lg:hidden absolute left-[27px] top-0 bottom-0 w-px bg-gradient-to-b from-[var(--electric-teal)] to-transparent"
+            style={{ transform: "scaleY(0)" }}
+          />
+
+          {/* Steps Grid */}
+          <div className="flex flex-col lg:flex-row gap-16 lg:gap-8 w-full">
             {steps.map((step, i) => (
               <div
                 key={i}
-                ref={(el) => (cardRefs.current[i] = el)}
-                data-testid={`process-step-${i}`}
-                className="relative"
+                ref={(el) => (stepRefs.current[i] = el)}
+                className="relative flex flex-row lg:flex-col items-start lg:w-1/4 group"
               >
-                {/* Step dot on timeline */}
-                <div
-                  className="absolute flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full"
-                  style={{
-                    left: "clamp(-3.5rem, -8vw, -4rem)",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "rgba(18,18,20,0.8)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(92,147,159,0.35)",
-                    boxShadow: "0 0 16px rgba(92,147,159,0.15)",
-                  }}
-                >
-                  <span className="font-mono text-[9px] tracking-widest" style={{ color: "var(--electric-teal)" }}>
+                {/* Step Dot & Number */}
+                <div className="relative z-10 flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-[#111111] border border-white/20 group-hover:border-[var(--electric-teal)] transition-all duration-500 step-dot shadow-lg group-hover:shadow-[0_0_20px_rgba(92,147,159,0.3)]">
+                  <div className="absolute inset-2 rounded-full bg-[var(--electric-teal)] opacity-0 group-hover:opacity-10 transition-opacity duration-500 blur-sm" />
+                  <span className="font-mono text-xs tracking-widest text-zinc-300 group-hover:text-white transition-colors">
                     {step.number}
                   </span>
                 </div>
 
-                {/* Card */}
-                <div
-                  className="rounded-2xl p-5 sm:p-6 lg:p-7 hover-card-dark"
-                  style={{
-                    background: step.color,
-                    backdropFilter: "blur(24px) saturate(160%)",
-                    WebkitBackdropFilter: "blur(24px) saturate(160%)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
-                    color: step.textColor,
-                  }}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <span
-                      className="font-mono text-[10px] uppercase tracking-[0.2em]"
-                      style={{ color: step.accent, opacity: 0.7 }}
-                    >
+                {/* Content Container */}
+                <div className="ml-8 lg:ml-0 lg:mt-10 step-content">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-6 h-px bg-[var(--electric-teal)]/50 hidden lg:block group-hover:w-10 transition-all duration-500" />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--electric-teal)]">
                       Step {step.number}
                     </span>
                   </div>
-                  <h3 className="font-heading text-2xl uppercase tracking-wide mb-3" style={{ color: step.textColor }}>
+                  <h3 className="font-heading text-xl md:text-2xl uppercase tracking-wide text-white mb-4 group-hover:text-[var(--electric-teal)] transition-colors duration-500">
                     {step.title}
                   </h3>
-                  <p className="text-base leading-relaxed" style={{ color: step.textColor, opacity: 0.75 }}>{step.desc}</p>
+                  <p className="text-[15px] leading-[1.7] text-zinc-400 font-light pr-4 group-hover:text-zinc-300 transition-colors duration-500">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -193,7 +181,7 @@ export default function ProcessSection() {
         </div>
 
         {/* CTA */}
-        <div className="mt-20 text-center">
+        <div className="mt-24 lg:mt-32 text-center md:text-left">
           <a
             href={CAL_LINK}
             target="_blank"
@@ -201,7 +189,7 @@ export default function ProcessSection() {
             data-testid="process-cta"
             className="btn-bracket text-white"
           >
-            Book a Call
+            Start The Process
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
