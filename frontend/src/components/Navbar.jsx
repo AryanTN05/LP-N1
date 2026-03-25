@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, X, Menu } from "lucide-react";
-import { gsap } from "@/lib/animations";
+import { gsap, ScrollTrigger } from "@/lib/animations";
 import { isSafari } from "@/lib/safari";
 
 const CAL_LINK = "https://cal.com/aryantn01/30min";
@@ -15,6 +15,7 @@ const navLinks = [
 export default function Navbar() {
   const [inLight, setInLight] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
   const menuRef = useRef(null);
   const menuLinksRef = useRef([]);
   const navRef = useRef(null);
@@ -135,6 +136,25 @@ export default function Navbar() {
     }
   }, [menuOpen]);
 
+  // ── Active section detection for pill nav ───────────────────
+  useEffect(() => {
+    const triggers = navLinks.map((link) => {
+      const id = link.href.replace("#", "");
+      const el = document.getElementById(id);
+      if (!el) return null;
+      return ScrollTrigger.create({
+        trigger: el,
+        start: "top 40%",
+        end: "bottom 40%",
+        onToggle: (self) => {
+          if (self.isActive) setActiveSection(id);
+          else setActiveSection((prev) => (prev === id ? null : prev));
+        },
+      });
+    });
+    return () => triggers.forEach((t) => t?.kill());
+  }, []);
+
   const handleNavClick = (href) => {
     setMenuOpen(false);
     setTimeout(() => {
@@ -212,15 +232,25 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-6 mx-4">
           <div className="w-px h-4 bg-white/10" />
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 hover:text-white transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.replace("#", "");
+            return (
+              <a
+                key={link.label}
+                href={link.href}
+                className="font-mono text-[10px] uppercase tracking-[0.18em] transition-all duration-300 px-2.5 py-1 rounded-full"
+                style={{
+                  color: isActive ? "#ffffff" : "rgba(160,160,160,0.7)",
+                  background: isActive ? "rgba(92,147,159,0.18)" : "transparent",
+                  fontWeight: isActive ? 600 : 400,
+                  boxShadow: isActive ? "0 0 12px rgba(92,147,159,0.35), inset 0 0 8px rgba(92,147,159,0.1)" : "none",
+                  letterSpacing: "0.18em",
+                }}
+              >
+                {link.label}
+              </a>
+            );
+          })}
           <div className="w-px h-4 bg-white/10" />
         </div>
 

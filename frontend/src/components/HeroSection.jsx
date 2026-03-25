@@ -88,11 +88,11 @@ export default function HeroSection() {
             className="text-right text-zinc-400"
             style={{ fontSize: "clamp(13px, 1.8vw, 15.5px)", fontWeight: 400, lineHeight: "1.85", letterSpacing: "0.01em" }}
           >
-            <span className="text-white font-medium block mb-2">Stop manual prospecting.</span>
+            <span className="text-white font-medium block mb-2">Stop manual prospecting</span>
             I build <span className="text-[var(--electric-teal)] font-medium">autonomous AI systems</span><br />
-            that find, qualify, and book<br />
+            that find qualify and book<br />
             meetings with your ideal clients<br />
-            so you focus on <span className="text-white font-medium">closing</span>.
+            so you focus on <span className="text-white font-medium">closing</span>
           </p>
         </div>
       </div>
@@ -165,8 +165,8 @@ export default function HeroSection() {
           </div>
 
           <p className="text-[14.5px] text-zinc-400 leading-[1.8] font-light">
-            <span className="text-white font-medium block mb-1">Stop manual prospecting.</span>
-            I build <span className="text-[var(--electric-teal)] font-medium">autonomous AI systems</span> that find, qualify, and book meetings with your ideal clients — so you focus on <span className="text-white font-medium">closing</span>.
+            <span className="text-white font-medium block mb-1">Stop manual prospecting</span>
+            I build <span className="text-[var(--electric-teal)] font-medium">autonomous AI systems</span> that find qualify and book meetings with your ideal clients — so you focus on <span className="text-white font-medium">closing</span>
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-2 mt-5">
             {tools.map((tool) => (
